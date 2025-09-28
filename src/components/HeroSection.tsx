@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import medicareInnovateLogo from '@/assets/medicare-innovate-logo.png';
 
 const HeroSection = () => {
   const scrollToTest = () => {
@@ -9,8 +10,17 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="bg-gradient-hero py-20 text-center">
-      <div className="container mx-auto px-4">
+    <section className="bg-gradient-hero py-20 text-center relative overflow-hidden">
+      {/* Background Logo */}
+      <div 
+        className="absolute inset-0 opacity-5 bg-no-repeat bg-center bg-contain"
+        style={{
+          backgroundImage: `url(${medicareInnovateLogo})`,
+          backgroundSize: '60%',
+        }}
+      />
+      
+      <div className="container mx-auto px-4 relative z-10">
         <h1 className="text-4xl md:text-6xl font-bold mb-6 text-foreground leading-tight">
           Automatize o Atendimento<br />da Sua Clínica
         </h1>

@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { MessageSquare, Hospital } from 'lucide-react';
+import medicareInnovateLogo from '@/assets/medicare-innovate-logo.png';
 
 const TestSection = () => {
   const handleWhatsAppTest = () => {
@@ -13,8 +14,16 @@ const TestSection = () => {
   };
 
   return (
-    <section id="teste" className="py-20 bg-gradient-hero">
-      <div className="container mx-auto px-4 text-center">
+    <section id="teste" className="py-20 bg-gradient-hero relative overflow-hidden">
+      {/* Background Logo - positioned differently for variety */}
+      <div 
+        className="absolute top-10 right-10 opacity-3 w-64 h-64 bg-no-repeat bg-contain"
+        style={{
+          backgroundImage: `url(${medicareInnovateLogo})`,
+        }}
+      />
+      
+      <div className="container mx-auto px-4 text-center relative z-10">
         <h2 className="text-3xl md:text-5xl font-bold mb-6 text-foreground">
           Teste Nossa Solução
         </h2>
@@ -22,7 +31,7 @@ const TestSection = () => {
           Experimente como funciona o atendimento automatizado em uma clínica de exemplo
         </p>
         
-        <Card className="max-w-lg mx-auto mb-12 shadow-card hover-lift bg-card">
+        <Card className="max-w-lg mx-auto mb-12 shadow-card hover-lift bg-card/95 backdrop-blur-sm">
           <CardContent className="p-8 text-center">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Hospital className="w-6 h-6 text-primary" />

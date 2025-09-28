@@ -1,11 +1,24 @@
+import medicareInnovateLogo from '@/assets/medicare-innovate-logo.png';
+
 const Footer = () => {
   return (
-    <footer id="contato" className="bg-foreground text-background py-12">
-      <div className="container mx-auto px-4 text-center">
+    <footer id="contato" className="bg-foreground text-background py-12 relative overflow-hidden">
+      {/* Background Logo */}
+      <div 
+        className="absolute bottom-0 left-0 opacity-5 w-48 h-48 bg-no-repeat bg-contain"
+        style={{
+          backgroundImage: `url(${medicareInnovateLogo})`,
+        }}
+      />
+      
+      <div className="container mx-auto px-4 text-center relative z-10">
         <div className="mb-6">
           <h3 className="text-2xl font-bold mb-2">IA Secretária</h3>
           <p className="text-lg opacity-90">
             Transformando o atendimento médico com inteligência artificial
+          </p>
+          <p className="text-sm opacity-75 mt-2">
+            Powered by Medicare Innovate
           </p>
         </div>
         
