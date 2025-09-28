@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
+import medicareInnovateLogo from '@/assets/medicare-innovate-logo.png';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,34 +21,11 @@ const Header = () => {
           {/* Logo */}
           <div className="flex items-center gap-4">
             <div className="w-12 h-12">
-              <svg width="48" height="48" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
-                {/* Círculo externo com padrão digital */}
-                <circle cx="25" cy="25" r="23" stroke="currentColor" strokeWidth="2" fill="none" strokeDasharray="4 2" opacity="0.8"/>
-                
-                {/* Órbitas do átomo */}
-                <ellipse cx="25" cy="25" rx="18" ry="8" fill="none" stroke="currentColor" strokeWidth="1.5" transform="rotate(30 25 25)" opacity="0.7"/>
-                <ellipse cx="25" cy="25" rx="18" ry="8" fill="none" stroke="currentColor" strokeWidth="1.5" transform="rotate(-30 25 25)" opacity="0.7"/>
-                <ellipse cx="25" cy="25" rx="18" ry="8" fill="none" stroke="currentColor" strokeWidth="1.5" transform="rotate(90 25 25)" opacity="0.7"/>
-                
-                {/* Olho central */}
-                <circle cx="25" cy="25" r="10" fill="url(#eyeGrad)"/>
-                <circle cx="25" cy="25" r="5" fill="white" opacity="0.2"/>
-                <circle cx="27" cy="23" r="2" fill="white" opacity="0.9"/>
-                
-                {/* Pontos de conexão neural */}
-                <circle cx="15" cy="15" r="1" fill="currentColor" opacity="0.6"/>
-                <circle cx="35" cy="15" r="1" fill="currentColor" opacity="0.6"/>
-                <circle cx="15" cy="35" r="1" fill="currentColor" opacity="0.6"/>
-                <circle cx="35" cy="35" r="1" fill="currentColor" opacity="0.6"/>
-                
-                <defs>
-                  <radialGradient id="eyeGrad" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" style={{stopColor: 'white', stopOpacity: 0.9}} />
-                    <stop offset="70%" style={{stopColor: 'currentColor', stopOpacity: 0.8}} />
-                    <stop offset="100%" style={{stopColor: 'currentColor', stopOpacity: 1}} />
-                  </radialGradient>
-                </defs>
-              </svg>
+              <img 
+                src={medicareInnovateLogo} 
+                alt="Medicare Innovate - IA Secretária" 
+                className="w-full h-full object-contain"
+              />
             </div>
             <div className="text-2xl font-bold">IA Secretária</div>
           </div>
