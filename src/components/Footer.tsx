@@ -10,7 +10,7 @@ const Footer = () => {
             <img 
               src={medicareInnovateLogo} 
               alt="Medicare Innovate" 
-              className="w-full h-full object-contain filter brightness-0 invert"
+              className="w-full h-full object-contain"
             />
           </div>
         </div>
