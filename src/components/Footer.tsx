@@ -6,7 +6,7 @@ const Footer = () => {
       <div className="container mx-auto px-4 text-center">
         {/* Logo Section */}
         <div className="mb-8">
-          <div className="w-32 h-32 mx-auto mb-6">
+          <div className="w-64 h-64 mx-auto mb-12">
             <img 
               src={medicareInnovateLogo} 
               alt="Medicare Innovate - IA Secretária" 
