@@ -1,4 +1,4 @@
-import medicareInnovateLogo from '@/assets/medicare-innovate-logo.png';
+import medicareInnovateLogo from '@/assets/medicare-innovate-logo-new.png';
 
 const Footer = () => {
   return (
