@@ -2,7 +2,7 @@ import medicareInnovateLogo from '@/assets/medicare-innovate-logo-final.png';
 
 const Footer = () => {
   return (
-    <footer id="contato" className="bg-foreground text-background py-16">
+    <footer id="contato" className="text-background py-16">
       <div className="container mx-auto px-4 text-center">
         {/* Logo Section */}
         <div className="mb-8">
@@ -38,10 +38,10 @@ const Footer = () => {
           </p>
           <p>
             <a 
-              href="tel:+5511999999999" 
+              href="tel:+5548984141354" 
               className="hover:opacity-80 transition-opacity"
             >
-              (11) 99999-9999
+              (48) 98414-1354
             </a>
           </p>
         </div>
