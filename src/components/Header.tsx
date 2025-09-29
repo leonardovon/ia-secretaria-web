@@ -27,7 +27,7 @@ const Header = () => {
                 className="w-full h-full object-contain"
               />
             </div>
-            <div className="text-2xl font-bold text-foreground">IA Secretária</div>
+            <div className="text-3xl font-bold text-foreground"></div>
           </div>
 
           {/* Desktop Navigation */}
