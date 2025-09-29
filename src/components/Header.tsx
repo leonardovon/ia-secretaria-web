@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
-import medicareInnovateLogo from '@/assets/medicare-innovate-logo-transparent.png';
+import medicareInnovateLogo from '@/assets/medicare-innovate-logo-final.png';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

@@ -1,4 +1,4 @@
-import medicareInnovateLogo from '@/assets/medicare-innovate-logo-transparent.png';
+import medicareInnovateLogo from '@/assets/medicare-innovate-logo-final.png';
 
 const Footer = () => {
   return (
@@ -6,12 +6,11 @@ const Footer = () => {
       <div className="container mx-auto px-4 text-center">
         {/* Logo Section */}
         <div className="mb-8">
-          <div className="w-32 h-32 mx-auto mb-6 bg-white/10 rounded-full p-4 flex items-center justify-center">
+          <div className="w-32 h-32 mx-auto mb-6">
             <img 
               src={medicareInnovateLogo} 
               alt="Medicare Innovate - IA Secretária" 
-              className="w-full h-full object-contain filter drop-shadow-lg"
-              style={{ backgroundColor: 'transparent' }}
+              className="w-full h-full object-contain"
             />
           </div>
         </div>
