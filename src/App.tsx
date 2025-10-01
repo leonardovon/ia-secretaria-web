@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import Messages from "./pages/Messages";
 import Pacientes from "./pages/Pacientes";
 import Agendamentos from "./pages/Agendamentos";
+import Configuracoes from "./pages/Configuracoes";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,6 +55,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Agendamentos />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/configuracoes" 
+              element={
+                <ProtectedRoute>
+                  <Configuracoes />
                 </ProtectedRoute>
               } 
             />
