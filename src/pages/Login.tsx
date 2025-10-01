@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 import { Stethoscope } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const loginSchema = z.object({
   username: z.string().trim().min(1, 'Usuário é obrigatório'),
@@ -111,6 +112,18 @@ export default function Login() {
               {isLoading ? 'Entrando...' : 'Entrar'}
             </Button>
           </form>
+          
+          <div className="mt-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              Não tem uma conta?{' '}
+              <Link 
+                to="/signup" 
+                className="text-primary hover:underline font-medium"
+              >
+                Criar nova conta
+              </Link>
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
