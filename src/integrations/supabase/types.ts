@@ -282,6 +282,10 @@ export type Database = {
       }
     }
     Functions: {
+      authenticate_clinic_user: {
+        Args: { p_password: string; p_username: string }
+        Returns: boolean
+      }
       binary_quantize: {
         Args: { "": string } | { "": unknown }
         Returns: unknown

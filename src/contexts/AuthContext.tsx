@@ -24,13 +24,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (username: string, password: string) => {
     try {
+      // Fazendo consulta direta usando SQL
       const { data, error } = await supabase
-        .rpc('authenticate_clinic_user', {
-          p_username: username,
-          p_password: password
-        });
+        .from('config' as any)
+        .select('id, nome_clinica, login')
+        .eq('login', username)
+        .eq('senha_hash', password)
+        .maybeSingle();
 
-      if (error || !data) {
+      if (error) {
+        console.error('Login error:', error);
+        return { success: false, error: 'Erro ao fazer login' };
+      }
+
+      if (!data) {
         return { success: false, error: 'Credenciais inválidas' };
       }
 
@@ -38,6 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsAuthenticated(true);
       return { success: true };
     } catch (err) {
+      console.error('Login exception:', err);
       return { success: false, error: 'Erro ao fazer login' };
     }
   };
