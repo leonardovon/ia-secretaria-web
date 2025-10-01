@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
-import medicareInnovateLogo from '@/assets/medicare-innovate-logo-final.png';
+import medicareInnovateLogo from '@/assets/logo_atendmed.jpg';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,7 +15,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white shadow-lg sticky top-0 z-50">
+      <header className="bg-card-foreground shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-6">
           {/* Logo */}
@@ -23,7 +23,7 @@ const Header = () => {
             <div className="w-16 h-16">
               <img 
                 src={medicareInnovateLogo} 
-                alt="Medicare Innovate - IA Secretária" 
+                alt="Atend Med IA Secretária" 
                 className="w-full h-full object-contain"
               />
             </div>

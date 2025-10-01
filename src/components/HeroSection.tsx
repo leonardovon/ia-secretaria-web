@@ -21,25 +21,17 @@ const HeroSection = () => {
     >
       <div className="container mx-auto px-4 relative z-10">
         <div className="mb-4">
-          <span className="inline-block bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
-            🏥 Clínica
-          </span>
+           <p className="text-2xl md:text-5xl mb-8 text-blue-50 max-w-3xl mx-auto leading-relaxed">
+              Modernize sua clínica médica com
+           </p>
         </div>
         <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
           IA Secretária
         </h1>
-        <h2 className="text-2xl md:text-3xl font-semibold mb-4 text-blue-100">
-          OFTALMOLOGIA
-        </h2>
         <p className="text-xl md:text-2xl mb-8 text-blue-50 max-w-3xl mx-auto leading-relaxed">
-          Sistema Inteligente de Agendamento Médico
+          Sistema Inteligente de Atendimento Médico
         </p>
-        <Button 
-          onClick={scrollToTest}
-          className="bg-white text-primary hover:bg-blue-50 px-8 py-6 text-lg font-semibold rounded-full shadow-elegant hover-lift transition-all duration-300 transform hover:scale-105"
-        >
-          Acessar o sistema
-        </Button>
+       
       </div>
     </section>
   );

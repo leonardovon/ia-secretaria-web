@@ -5,12 +5,12 @@ const BenefitsSection = () => {
   const benefits = [
     {
       icon: Users,
-      title: "Redução da Carga de Trabalho",
+      title: "Otimização da Carga de Trabalho",
       description: "Suas atendentes podem focar em atividades mais estratégicas enquanto o agente cuida do atendimento básico"
     },
     {
       icon: Clock,
-      title: "Atendimento 24/7",
+      title: "Atendimento 24h",
       description: "Pacientes podem agendar consultas e tirar dúvidas a qualquer hora, mesmo fora do horário comercial"
     },
     {
@@ -25,7 +25,7 @@ const BenefitsSection = () => {
     },
     {
       icon: DollarSign,
-      title: "Economia de Custos",
+      title: "Economia",
       description: "Reduz a necessidade de equipe adicional para atendimento, otimizando custos operacionais"
     }
   ];
@@ -34,7 +34,7 @@ const BenefitsSection = () => {
     <section id="beneficios" className="py-20 bg-muted">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl md:text-5xl font-bold text-center mb-16 text-foreground">
-          Benefícios para Sua Clínica
+          Benefícios para sua Clínica
         </h2>
         <div className="max-w-4xl mx-auto space-y-4">
           {benefits.map((benefit, index) => (

@@ -6,12 +6,12 @@ const FeaturesSection = () => {
     {
       icon: Bot,
       title: "Atendimento Automatizado",
-      description: "Responde automaticamente dúvidas sobre endereço, especialidades, médicos e procedimentos da sua clínica"
+      description: "Responde automaticamente dúvidas frequentes dos pacientes como endereço, especialidades, médicos, planos e procedimentos da sua clínica"
     },
     {
       icon: Calendar,
       title: "Gestão de Agendamentos", 
-      description: "Agenda, remarca e cancela consultas automaticamente, enviando confirmações aos pacientes"
+      description: "Tenha o controle da Agenda médica! Nosso agente marca, remarca e cancela consultas automaticamente além do follow-up com os pacientes"
     },
     {
       icon: MessageSquare,

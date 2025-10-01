@@ -5,65 +5,52 @@
 /* IA Secretaria Design System - Healthcare AI Assistant */
 
 @layer base {
-  :root {
-    /* Base colors - Clean medical theme */
-    --background: 0 0% 98.5%;
-    --foreground: 248 94% 15%;
-
-    /* Card system */
-    --card: 0 0% 100%;
-    --card-foreground: 208 30% 15%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 208 30% 15%;
-
-    /* Primary brand - Medical blue from hero image */
-    --primary: 208 85% 52%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 208 85% 65%;
-    --purple-primary: 208 85% 48%;
-
-    /* Secondary colors */
-    --secondary: 208 45% 96%;
-    --secondary-foreground: 208 30% 15%;
-
-    /* Muted elements */
-    --muted: 208 25% 95%;
-    --muted-foreground: 208 15% 50%;
-
-    /* Accent colors */
-    --accent: 208 75% 60%;
-    --accent-foreground: 0 0% 100%;
-
-    /* Status colors */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --success: 145 85% 47%;
-    --success-foreground: 0 0% 100%;
-
-    /* UI elements */
-    --border: 208 25% 88%;
-    --input: 208 25% 88%;
-    --ring: 208 85% 52%;
-
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-medical: linear-gradient(135deg, hsl(208 85% 52%), hsl(208 85% 65%));
-    --gradient-hero: linear-gradient(135deg, hsl(var(--background)), hsl(var(--muted)));
-    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
-
-    /* Shadows */
-    --shadow-elegant: 0 10px 30px -10px hsl(var(--primary) / 0.2);
-    --shadow-glow: 0 0 40px hsl(var(--primary-glow) / 0.3);
-    --shadow-card: 0 4px 20px -4px hsl(208 30% 15% / 0.1);
-
-    /* Animations */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-
-    --radius: 0.75rem;
-
-  }
+    :root {
+        /* Base colors - Clean medical theme */
+        --background: 0 0% 98.5%;
+        --foreground: 255 94% 15%;
+        /* Card system */
+        --card: 0 0% 100%;
+        --card-foreground: 211 100% 10%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 208 30% 15%;
+        /* Primary brand - Medical blue from hero image */
+        --primary: 208 85% 52%;
+        --primary-foreground: 0 0% 100%;
+        --primary-glow: 208 85% 65%;
+        --purple-primary: 208 85% 48%;
+        /* Secondary colors */
+        --secondary: 208 45% 96%;
+        --secondary-foreground: 208 30% 15%;
+        /* Muted elements */
+        --muted: 208 25% 95%;
+        --muted-foreground: 208 15% 50%;
+        /* Accent colors */
+        --accent: 208 75% 60%;
+        --accent-foreground: 0 0% 100%;
+        /* Status colors */
+        --destructive: 0 84% 60%;
+        --destructive-foreground: 0 0% 100%;
+        --success: 145 85% 47%;
+        --success-foreground: 0 0% 100%;
+        /* UI elements */
+        --border: 208 25% 88%;
+        --input: 208 25% 88%;
+        --ring: 208 85% 52%;
+        /* Gradients */
+        --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+        --gradient-medical: linear-gradient(135deg, hsl(208 85% 52%), hsl(208 85% 65%));
+        --gradient-hero: linear-gradient(135deg, hsl(var(--background)), hsl(var(--muted)));
+        --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
+        /* Shadows */
+        --shadow-elegant: 0 10px 30px -10px hsl(var(--primary) / 0.2);
+        --shadow-glow: 0 0 40px hsl(var(--primary-glow) / 0.3);
+        --shadow-card: 0 4px 20px -4px hsl(208 30% 15% / 0.1);
+        /* Animations */
+        --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        --radius: 0.75rem;
+    }
 
   .dark {
     /* Dark mode - Professional medical theme */

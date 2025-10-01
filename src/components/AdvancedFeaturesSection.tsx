@@ -16,11 +16,11 @@ const AdvancedFeaturesSection = () => {
     {
       icon: Brain,
       title: "Treinamento Automático",
-      description: "O sistema aprende continuamente através de mensagens codificadas, melhorando constantemente"
+      description: "O sistema aprende continuamente através de mensagens codificadas, melhorando constantemente e sem a necessidade de intervenções da nossa equipe"
     },
     {
       icon: UserCheck,
-      title: "Escalação Humana",
+      title: "Mantenha o controle",
       description: "Identifica quando é necessário transferir o atendimento para um humano, garantindo qualidade"
     }
   ];
