@@ -12,9 +12,9 @@ import { z } from 'zod';
 import { Stethoscope, ArrowLeft } from 'lucide-react';
 
 const signUpSchema = z.object({
-  nome_clinica: z.string().trim().min(3, 'Nome da clínica deve ter pelo menos 3 caracteres'),
+  nome_clinica: z.string().trim().min(3, 'Seu nome deve ter pelo menos 3 caracteres'),
   telefone: z.string().trim().min(10, 'Telefone inválido').max(15, 'Telefone inválido'),
-  endereco: z.string().trim().min(5, 'Endereço deve ter pelo menos 5 caracteres'),
+  endereco: z.string().trim(),
   email: z.string().trim().email('E-mail inválido'),
   login: z.string().trim().min(3, 'Login deve ter pelo menos 3 caracteres'),
   senha: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
@@ -64,9 +64,17 @@ export default function SignUp() {
         .rpc('get_clinica_config');
 
       if (existingConfig && existingConfig.length > 0) {
+        const existing = existingConfig[0] as any;
+        const conflicts: string[] = [];
+        if (existing?.login && existing.login === validatedData.login) conflicts.push('Login');
+        if (existing?.telefone && existing.telefone === validatedData.telefone) conflicts.push('Telefone');
+        if (existing?.nome_clinica && existing.nome_clinica === validatedData.nome_clinica) conflicts.push('Seu nome');
+
         toast({
           title: 'Erro',
-          description: 'Já existe uma conta cadastrada no sistema',
+          description: conflicts.length > 0
+            ? `Já existe uma conta cadastrada. Campos em conflito: ${conflicts.join(', ')}.`
+            : `Já existe uma conta cadastrada no sistema (login: ${existing?.login ?? 'indisponível'}).`,
           variant: 'destructive',
         });
         setIsLoading(false);
@@ -77,7 +85,7 @@ export default function SignUp() {
       const { error } = await supabase.rpc('update_clinica_config', {
         p_nome_clinica: validatedData.nome_clinica,
         p_telefone: validatedData.telefone,
-        p_endereco: validatedData.endereco,
+        p_endereco: validatedData.endereco || null,
         p_login: validatedData.login,
         p_senha_hash: validatedData.senha,
       });
@@ -132,14 +140,14 @@ export default function SignUp() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="nome_clinica">Nome da Clínica *</Label>
+              <Label htmlFor="nome_clinica">Seu nome *</Label>
               <Input
                 id="nome_clinica"
                 name="nome_clinica"
                 type="text"
                 value={formData.nome_clinica}
                 onChange={handleChange}
-                placeholder="Digite o nome da clínica"
+                placeholder="Digite seu nome"
                 disabled={isLoading}
               />
             </div>
@@ -172,18 +180,18 @@ export default function SignUp() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="endereco">Endereço *</Label>
-              <Textarea
-                id="endereco"
-                name="endereco"
-                value={formData.endereco}
-                onChange={handleChange}
-                placeholder="Digite o endereço completo"
-                disabled={isLoading}
-                rows={2}
-              />
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="endereco">Cidade e UF</Label>
+                <Textarea
+                  id="endereco"
+                  name="endereco"
+                  value={formData.endereco}
+                  onChange={handleChange}
+                  placeholder="Ex.: Curitiba - PR"
+                  disabled={isLoading}
+                  rows={2}
+                />
+              </div>
 
             <div className="border-t pt-4 mt-4">
               <h3 className="text-lg font-semibold mb-4">Dados de Acesso</h3>
