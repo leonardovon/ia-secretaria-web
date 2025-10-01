@@ -19,9 +19,9 @@ interface Message {
 interface Chat {
   phone: string;
   nomewpp: string;
-  lastMessage: string;
-  lastMessageTime: string;
-  unreadCount: number;
+  last_message: string;
+  last_message_time: string;
+  unread_count: number;
 }
 
 export default function Messages() {
@@ -42,40 +42,19 @@ export default function Messages() {
 
   const fetchChats = async () => {
     const { data, error } = await supabase
-      .schema('clinica' as any)
-      .from('chat_messages')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .rpc('get_clinica_chats');
 
     if (error) {
       console.error('Error fetching chats:', error);
       return;
     }
 
-    // Group messages by phone
-    const chatMap = new Map<string, Chat>();
-    data?.forEach((msg: Message) => {
-      if (!chatMap.has(msg.phone)) {
-        chatMap.set(msg.phone, {
-          phone: msg.phone,
-          nomewpp: msg.nomewpp || msg.phone,
-          lastMessage: msg.user_message || msg.bot_message || '',
-          lastMessageTime: msg.created_at,
-          unreadCount: 0,
-        });
-      }
-    });
-
-    setChats(Array.from(chatMap.values()));
+    setChats(data || []);
   };
 
   const fetchMessages = async (phone: string) => {
     const { data, error } = await supabase
-      .schema('clinica' as any)
-      .from('chat_messages')
-      .select('*')
-      .eq('phone', phone)
-      .order('created_at', { ascending: true });
+      .rpc('get_clinica_messages', { p_phone: phone });
 
     if (error) {
       console.error('Error fetching messages:', error);
@@ -136,13 +115,13 @@ export default function Messages() {
                 <div className="flex justify-between items-baseline">
                   <h3 className="font-medium text-[#e9edef] truncate">{chat.nomewpp}</h3>
                   <span className="text-xs text-[#8696a0]">
-                    {new Date(chat.lastMessageTime).toLocaleTimeString('pt-BR', {
+                    {new Date(chat.last_message_time).toLocaleTimeString('pt-BR', {
                       hour: '2-digit',
                       minute: '2-digit',
                     })}
                   </span>
                 </div>
-                <p className="text-sm text-[#8696a0] truncate">{chat.lastMessage}</p>
+                <p className="text-sm text-[#8696a0] truncate">{chat.last_message}</p>
               </div>
             </div>
           ))}

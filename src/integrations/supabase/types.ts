@@ -290,6 +290,29 @@ export type Database = {
         Args: { "": string } | { "": unknown }
         Returns: unknown
       }
+      get_clinica_chats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          last_message: string
+          last_message_time: string
+          nomewpp: string
+          phone: string
+          unread_count: number
+        }[]
+      }
+      get_clinica_messages: {
+        Args: { p_phone: string }
+        Returns: {
+          active: boolean
+          bot_message: string
+          created_at: string
+          id: number
+          message_type: string
+          nomewpp: string
+          phone: string
+          user_message: string
+        }[]
+      }
       halfvec_avg: {
         Args: { "": number[] }
         Returns: unknown
