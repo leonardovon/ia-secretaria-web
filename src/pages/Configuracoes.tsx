@@ -50,14 +50,10 @@ export default function Configuracoes() {
     queryKey: ['clinic-config'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .schema('clinica')
-        .from('config')
-        .select('*')
-        .limit(1)
-        .maybeSingle();
+        .rpc('get_clinica_config');
       
       if (error) throw error;
-      return data as Config | null;
+      return data && data.length > 0 ? data[0] as Config : null;
     },
   });
 
@@ -75,30 +71,16 @@ export default function Configuracoes() {
 
   const updateMutation = useMutation({
     mutationFn: async (updates: Partial<Config>) => {
-      if (!config?.id) {
-        // Create new config if doesn't exist
-        const { data, error } = await supabase
-          .schema('clinica')
-          .from('config')
-          .insert([updates])
-          .select()
-          .single();
-        
-        if (error) throw error;
-        return data;
-      } else {
-        // Update existing config
-        const { data, error } = await supabase
-          .schema('clinica')
-          .from('config')
-          .update(updates)
-          .eq('id', config.id)
-          .select()
-          .single();
-        
-        if (error) throw error;
-        return data;
-      }
+      const { data, error } = await supabase.rpc('update_clinica_config', {
+        p_nome_clinica: updates.nome_clinica!,
+        p_telefone: updates.telefone!,
+        p_endereco: updates.endereco || null,
+        p_login: updates.login!,
+        p_senha_hash: updates.senha_hash || null,
+      });
+      
+      if (error) throw error;
+      return data && data.length > 0 ? data[0] : null;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clinic-config'] });

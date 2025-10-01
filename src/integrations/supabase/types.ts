@@ -301,6 +301,18 @@ export type Database = {
           unread_count: number
         }[]
       }
+      get_clinica_config: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string
+          endereco: string
+          id: string
+          login: string
+          nome_clinica: string
+          telefone: string
+          updated_at: string
+        }[]
+      }
       get_clinica_messages: {
         Args: { p_phone: string }
         Returns: {
@@ -427,6 +439,24 @@ export type Database = {
       unaccent_init: {
         Args: { "": unknown }
         Returns: unknown
+      }
+      update_clinica_config: {
+        Args: {
+          p_endereco: string
+          p_login: string
+          p_nome_clinica: string
+          p_senha_hash?: string
+          p_telefone: string
+        }
+        Returns: {
+          created_at: string
+          endereco: string
+          id: string
+          login: string
+          nome_clinica: string
+          telefone: string
+          updated_at: string
+        }[]
       }
       vector_avg: {
         Args: { "": number[] }
