@@ -9,6 +9,8 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Messages from "./pages/Messages";
+import Pacientes from "./pages/Pacientes";
+import Agendamentos from "./pages/Agendamentos";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +38,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Messages />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/pacientes" 
+              element={
+                <ProtectedRoute>
+                  <Pacientes />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/agendamentos" 
+              element={
+                <ProtectedRoute>
+                  <Agendamentos />
                 </ProtectedRoute>
               } 
             />
