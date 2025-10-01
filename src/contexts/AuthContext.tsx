@@ -24,13 +24,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (username: string, password: string) => {
     try {
-      // Fazendo consulta direta usando SQL
       const { data, error } = await supabase
-        .from('config' as any)
-        .select('id, nome_clinica, login')
-        .eq('login', username)
-        .eq('senha_hash', password)
-        .maybeSingle();
+        .rpc('authenticate_clinic_user', {
+          p_username: username,
+          p_password: password
+        });
 
       if (error) {
         console.error('Login error:', error);
