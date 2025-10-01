@@ -46,9 +46,13 @@ export default function SignUp() {
   }, [isAuthenticated, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const value = e.target.name === 'login' 
+      ? e.target.value.toLowerCase() 
+      : e.target.value;
+    
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: value
     }));
   };
 
@@ -56,7 +60,10 @@ export default function SignUp() {
     e.preventDefault();
 
     try {
-      const validatedData = signUpSchema.parse(formData);
+      const validatedData = {
+        ...signUpSchema.parse(formData),
+        login: formData.login.toLowerCase()
+      };
       setIsLoading(true);
 
       // Verificar se já existe configuração
@@ -64,17 +71,9 @@ export default function SignUp() {
         .rpc('get_clinica_config');
 
       if (existingConfig && existingConfig.length > 0) {
-        const existing = existingConfig[0] as any;
-        const conflicts: string[] = [];
-        if (existing?.login && existing.login === validatedData.login) conflicts.push('Login');
-        if (existing?.telefone && existing.telefone === validatedData.telefone) conflicts.push('Telefone');
-        if (existing?.nome_clinica && existing.nome_clinica === validatedData.nome_clinica) conflicts.push('Seu nome');
-
         toast({
           title: 'Erro',
-          description: conflicts.length > 0
-            ? `Já existe uma conta cadastrada. Campos em conflito: ${conflicts.join(', ')}.`
-            : `Já existe uma conta cadastrada no sistema (login: ${existing?.login ?? 'indisponível'}).`,
+          description: 'Já existe uma conta cadastrada no sistema. O sistema permite apenas uma conta por clínica. Se você esqueceu sua senha, entre em contato com o suporte.',
           variant: 'destructive',
         });
         setIsLoading(false);
