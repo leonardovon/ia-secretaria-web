@@ -296,6 +296,7 @@ export type Database = {
           last_message: string
           last_message_time: string
           nomewpp: string
+          patient_name: string
           phone: string
           unread_count: number
         }[]

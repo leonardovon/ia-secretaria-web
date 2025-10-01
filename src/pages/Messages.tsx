@@ -19,6 +19,7 @@ interface Message {
 interface Chat {
   phone: string;
   nomewpp: string;
+  patient_name: string | null;
   last_message: string;
   last_message_time: string;
   unread_count: number;
@@ -65,6 +66,7 @@ export default function Messages() {
   };
 
   const filteredChats = chats.filter(chat =>
+    (chat.patient_name?.toLowerCase().includes(searchQuery.toLowerCase())) ||
     chat.nomewpp.toLowerCase().includes(searchQuery.toLowerCase()) ||
     chat.phone.includes(searchQuery)
   );
@@ -108,12 +110,14 @@ export default function Messages() {
             >
               <Avatar className="h-12 w-12 bg-[#6b7c85]">
                 <AvatarFallback className="bg-[#6b7c85] text-[#e9edef]">
-                  {chat.nomewpp.charAt(0).toUpperCase()}
+                  {(chat.patient_name || chat.nomewpp).charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-baseline">
-                  <h3 className="font-medium text-[#e9edef] truncate">{chat.nomewpp}</h3>
+                  <h3 className="font-medium text-[#e9edef] truncate">
+                    {chat.patient_name || chat.nomewpp}
+                  </h3>
                   <span className="text-xs text-[#8696a0]">
                     {new Date(chat.last_message_time).toLocaleTimeString('pt-BR', {
                       hour: '2-digit',
@@ -121,6 +125,7 @@ export default function Messages() {
                     })}
                   </span>
                 </div>
+                <p className="text-sm text-[#67757f] text-xs truncate">{chat.phone}</p>
                 <p className="text-sm text-[#8696a0] truncate">{chat.last_message}</p>
               </div>
             </div>
@@ -137,11 +142,13 @@ export default function Messages() {
               <div className="flex items-center gap-3">
                 <Avatar className="h-10 w-10 bg-[#6b7c85]">
                   <AvatarFallback className="bg-[#6b7c85] text-[#e9edef]">
-                    {selectedChatData?.nomewpp.charAt(0).toUpperCase()}
+                    {(selectedChatData?.patient_name || selectedChatData?.nomewpp || '?').charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h2 className="font-medium text-[#e9edef]">{selectedChatData?.nomewpp}</h2>
+                  <h2 className="font-medium text-[#e9edef]">
+                    {selectedChatData?.patient_name || selectedChatData?.nomewpp}
+                  </h2>
                   <p className="text-xs text-[#8696a0]">{selectedChat}</p>
                 </div>
               </div>
