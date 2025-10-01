@@ -42,6 +42,7 @@ export default function Messages() {
 
   const fetchChats = async () => {
     const { data, error } = await supabase
+      .schema('clinica' as any)
       .from('chat_messages')
       .select('*')
       .order('created_at', { ascending: false });
@@ -70,6 +71,7 @@ export default function Messages() {
 
   const fetchMessages = async (phone: string) => {
     const { data, error } = await supabase
+      .schema('clinica' as any)
       .from('chat_messages')
       .select('*')
       .eq('phone', phone)
