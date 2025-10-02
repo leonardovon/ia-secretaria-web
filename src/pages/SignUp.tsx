@@ -66,19 +66,6 @@ export default function SignUp() {
       };
       setIsLoading(true);
 
-      // Verificar se já existe configuração
-      const { data: existingConfig } = await supabase
-        .rpc('get_clinica_config');
-
-      if (existingConfig && existingConfig.length > 0) {
-        toast({
-          title: 'Erro',
-          description: 'Já existe uma conta cadastrada no sistema. O sistema permite apenas uma conta por clínica. Se você esqueceu sua senha, entre em contato com o suporte.',
-          variant: 'destructive',
-        });
-        setIsLoading(false);
-        return;
-      }
 
       // Criar nova configuração
       const { error } = await supabase.rpc('update_clinica_config', {
