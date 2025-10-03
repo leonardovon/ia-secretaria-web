@@ -33,6 +33,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { WeeklyCalendar } from '@/components/WeeklyCalendar';
 
 interface Appointment {
   id: string;
@@ -359,78 +361,96 @@ export default function Agendamentos() {
           </Dialog>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Lista de Agendamentos</CardTitle>
-            <CardDescription>
-              <div className="flex items-center gap-2 mt-2">
-                <Search className="w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar por paciente, médico ou procedimento..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="max-w-sm"
-                />
-              </div>
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <p className="text-center text-muted-foreground py-8">Carregando...</p>
-            ) : filteredAppointments.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">Nenhum agendamento encontrado</p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Paciente</TableHead>
-                    <TableHead>Médico</TableHead>
-                    <TableHead>Procedimento</TableHead>
-                    <TableHead>Data/Hora</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredAppointments.map((appointment) => (
-                    <TableRow key={appointment.id}>
-                      <TableCell className="font-medium">{getPatientName(appointment.paciente_id)}</TableCell>
-                      <TableCell>{getDoctorName(appointment.medico_id)}</TableCell>
-                      <TableCell>{appointment.procedimento}</TableCell>
-                      <TableCell>{new Date(appointment.data_agendamento).toLocaleString('pt-BR')}</TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          appointment.status === 'agendado' ? 'bg-blue-100 text-blue-800' :
-                          appointment.status === 'confirmado' ? 'bg-green-100 text-green-800' :
-                          appointment.status === 'cancelado' ? 'bg-red-100 text-red-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {appointment.status}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEdit(appointment)}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(appointment.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
+        <Tabs defaultValue="lista" className="w-full">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="lista">Lista de Agendamentos</TabsTrigger>
+            <TabsTrigger value="calendario">Calendário</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="lista">
+            <Card>
+              <CardHeader>
+                <CardTitle>Lista de Agendamentos</CardTitle>
+                <CardDescription>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Search className="w-4 h-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Buscar por paciente, médico ou procedimento..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="max-w-sm"
+                    />
+                  </div>
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <p className="text-center text-muted-foreground py-8">Carregando...</p>
+                ) : filteredAppointments.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">Nenhum agendamento encontrado</p>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Paciente</TableHead>
+                        <TableHead>Médico</TableHead>
+                        <TableHead>Procedimento</TableHead>
+                        <TableHead>Data/Hora</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredAppointments.map((appointment) => (
+                        <TableRow key={appointment.id}>
+                          <TableCell className="font-medium">{getPatientName(appointment.paciente_id)}</TableCell>
+                          <TableCell>{getDoctorName(appointment.medico_id)}</TableCell>
+                          <TableCell>{appointment.procedimento}</TableCell>
+                          <TableCell>{new Date(appointment.data_agendamento).toLocaleString('pt-BR')}</TableCell>
+                          <TableCell>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              appointment.status === 'agendado' ? 'bg-blue-100 text-blue-800' :
+                              appointment.status === 'confirmado' ? 'bg-green-100 text-green-800' :
+                              appointment.status === 'cancelado' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {appointment.status}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEdit(appointment)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(appointment.id)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="calendario">
+            <WeeklyCalendar
+              appointments={appointments}
+              patients={patients}
+              doctors={doctors}
+              onEditAppointment={handleEdit}
+            />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
