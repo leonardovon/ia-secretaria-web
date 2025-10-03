@@ -55,21 +55,18 @@ export function WeeklyCalendar({ appointments, patients, doctors, onEditAppointm
 
   const getAppointmentsForSlot = (day: Date, time: string) => {
     return appointments.filter(apt => {
+      // Parse the UTC date and convert to local timezone
       const aptDate = parseISO(apt.data_agendamento);
-      const aptTime = format(aptDate, 'HH:mm');
-      const isSameDayResult = isSameDay(aptDate, day);
       
-      // Debug logs
-      console.log('Checking appointment:', {
-        id: apt.id,
-        data_agendamento: apt.data_agendamento,
-        aptDate: aptDate.toISOString(),
-        aptTime,
-        dayToCompare: day.toISOString(),
-        timeSlot: time,
-        isSameDay: isSameDayResult,
-        matches: isSameDayResult && aptTime === time
-      });
+      // Get local date components
+      const aptLocalDate = new Date(aptDate.getFullYear(), aptDate.getMonth(), aptDate.getDate());
+      const dayLocalDate = new Date(day.getFullYear(), day.getMonth(), day.getDate());
+      
+      // Check if same day (comparing only date part)
+      const isSameDayResult = aptLocalDate.getTime() === dayLocalDate.getTime();
+      
+      // Get time in local timezone
+      const aptTime = format(aptDate, 'HH:mm');
       
       return isSameDayResult && aptTime === time;
     });
