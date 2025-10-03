@@ -10,12 +10,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Plus, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 
 interface Clinic {
   id: string;
   nome_clinica: string;
   telefone: string;
+  endereco: string;
 }
 
 interface UserAccount {
@@ -67,7 +68,7 @@ export default function GestaoContas() {
       if (clinicsError) {
         console.error('Error loading clinics:', clinicsError);
       } else {
-        setClinics(clinicsData || []);
+        setClinics((clinicsData as Clinic[]) || []);
       }
 
       // Carregar contas via RPC
@@ -77,7 +78,7 @@ export default function GestaoContas() {
       if (accountsError) {
         console.error('Error loading accounts:', accountsError);
       } else {
-        setAccounts(accountsData || []);
+        setAccounts((accountsData as UserAccount[]) || []);
       }
     } catch (error) {
       console.error('Error loading data:', error);
