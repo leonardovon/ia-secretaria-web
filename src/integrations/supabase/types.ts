@@ -284,7 +284,14 @@ export type Database = {
     Functions: {
       authenticate_clinic_user: {
         Args: { p_password: string; p_username: string }
-        Returns: boolean
+        Returns: {
+          clinic_id: string
+          full_name: string
+          role: string
+          success: boolean
+          user_id: string
+          username: string
+        }[]
       }
       binary_quantize: {
         Args: { "": string } | { "": unknown }
@@ -303,6 +310,18 @@ export type Database = {
       }
       get_clinica_config: {
         Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string
+          endereco: string
+          id: string
+          login: string
+          nome_clinica: string
+          telefone: string
+          updated_at: string
+        }[]
+      }
+      get_clinica_config_by_id: {
+        Args: { p_clinic_id: string }
         Returns: {
           created_at: string
           endereco: string

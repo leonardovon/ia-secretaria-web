@@ -13,6 +13,7 @@ import Messages from "./pages/Messages";
 import Pacientes from "./pages/Pacientes";
 import Agendamentos from "./pages/Agendamentos";
 import Configuracoes from "./pages/Configuracoes";
+import GestaoContas from "./pages/GestaoContas";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
