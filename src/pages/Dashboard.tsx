@@ -2,10 +2,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, MessageSquare, Users, Calendar, Settings } from 'lucide-react';
+import { LogOut, MessageSquare, Users, Calendar, Settings, UserCog } from 'lucide-react';
 
 export default function Dashboard() {
-  const { logout } = useAuth();
+  const { logout, userData } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -101,6 +101,25 @@ export default function Dashboard() {
               </Button>
             </CardContent>
           </Card>
+
+          {userData?.role === 'admin' && (
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer border-primary/50">
+              <CardHeader>
+                <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mb-4">
+                  <UserCog className="w-6 h-6 text-primary" />
+                </div>
+                <CardTitle>Gestão de Contas</CardTitle>
+                <CardDescription>
+                  Gerencie usuários e permissões
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="outline" className="w-full" onClick={() => navigate('/gestao-contas')}>
+                  Acessar
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </main>
     </div>

@@ -61,14 +61,16 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
-            <Route 
-              path="/configuracoes" 
-              element={
-                <ProtectedRoute>
-                  <Configuracoes />
-                </ProtectedRoute>
-              } 
-            />
+            <Route path="/configuracoes" element={
+              <ProtectedRoute>
+                <Configuracoes />
+              </ProtectedRoute>
+            } />
+            <Route path="/gestao-contas" element={
+              <ProtectedRoute>
+                <GestaoContas />
+              </ProtectedRoute>
+            } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

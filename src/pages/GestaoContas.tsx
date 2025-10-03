@@ -60,25 +60,19 @@ export default function GestaoContas() {
 
   const loadData = async () => {
     try {
-      // Carregar clínicas
+      // Carregar clínicas via RPC
       const { data: clinicsData, error: clinicsError } = await supabase
-        .rpc('get_clinica_config');
+        .rpc('list_clinicas');
 
-      if (clinicsError) throw clinicsError;
-      
-      const clinicsArray = Array.isArray(clinicsData) ? clinicsData : clinicsData ? [clinicsData] : [];
-      setClinics(clinicsArray.map(c => ({
-        id: c.id,
-        nome_clinica: c.nome_clinica,
-        telefone: c.telefone
-      })));
+      if (clinicsError) {
+        console.error('Error loading clinics:', clinicsError);
+      } else {
+        setClinics(clinicsData || []);
+      }
 
-      // Carregar contas usando query direta
+      // Carregar contas via RPC
       const { data: accountsData, error: accountsError } = await supabase
-        .schema('clinica')
-        .from('user_accounts' as any)
-        .select('*')
-        .order('created_at', { ascending: false });
+        .rpc('list_user_accounts');
 
       if (accountsError) {
         console.error('Error loading accounts:', accountsError);
@@ -100,16 +94,13 @@ export default function GestaoContas() {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase
-        .schema('clinica')
-        .from('user_accounts' as any)
-        .insert([{
-          clinic_id: formData.clinic_id,
-          username: formData.username.toLowerCase(),
-          password_hash: formData.password,
-          full_name: formData.full_name,
-          role: formData.role
-        }]);
+      const { error } = await supabase.rpc('create_user_account', {
+        p_clinic_id: formData.clinic_id,
+        p_username: formData.username,
+        p_password_hash: formData.password,
+        p_full_name: formData.full_name,
+        p_role: formData.role
+      });
 
       if (error) throw error;
 
@@ -143,11 +134,9 @@ export default function GestaoContas() {
     if (!confirm('Tem certeza que deseja excluir esta conta?')) return;
 
     try {
-      const { error } = await supabase
-        .schema('clinica')
-        .from('user_accounts' as any)
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.rpc('delete_user_account', {
+        p_account_id: id
+      });
 
       if (error) throw error;
 
