@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { format, addWeeks, startOfWeek, addDays, isSameDay, parseISO } from 'date-fns';
+import { format, addWeeks, startOfWeek, addDays } from 'date-fns';
+import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
 import { ptBR } from 'date-fns/locale';
 
 interface Appointment {
@@ -34,6 +35,7 @@ interface WeeklyCalendarProps {
 
 export function WeeklyCalendar({ appointments, patients, doctors, onEditAppointment }: WeeklyCalendarProps) {
   const [currentWeek, setCurrentWeek] = useState(new Date());
+  const CLINIC_TZ = 'America/Sao_Paulo';
   
   const weekStart = startOfWeek(currentWeek, { locale: ptBR });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
@@ -55,20 +57,23 @@ export function WeeklyCalendar({ appointments, patients, doctors, onEditAppointm
 
   const getAppointmentsForSlot = (day: Date, time: string) => {
     return appointments.filter(apt => {
-      // Parse the UTC date and convert to local timezone
-      const aptDate = parseISO(apt.data_agendamento);
-      
-      // Get local date components
-      const aptLocalDate = new Date(aptDate.getFullYear(), aptDate.getMonth(), aptDate.getDate());
-      const dayLocalDate = new Date(day.getFullYear(), day.getMonth(), day.getDate());
-      
-      // Check if same day (comparing only date part)
-      const isSameDayResult = aptLocalDate.getTime() === dayLocalDate.getTime();
-      
-      // Get time in local timezone
-      const aptTime = format(aptDate, 'HH:mm');
-      
-      return isSameDayResult && aptTime === time;
+      // Interpretar o timestamp salvo como horário LOCAL da clínica
+      const raw = apt.data_agendamento.replace(/([+-]\d{2}:\d{2}|Z)$/,'');
+      // Converte do horário de parede da clínica para um Date UTC correto
+      const aptUtc = fromZonedTime(raw, CLINIC_TZ);
+
+      // Comparar usando o fuso da clínica
+      const aptDayStr = formatInTimeZone(aptUtc, CLINIC_TZ, 'yyyy-MM-dd');
+      const dayStr = formatInTimeZone(day, CLINIC_TZ, 'yyyy-MM-dd');
+      const aptTimeStr = formatInTimeZone(aptUtc, CLINIC_TZ, 'HH:mm');
+
+      const match = aptDayStr === dayStr && aptTimeStr === time;
+
+      if (match) {
+        console.debug('[Calendário] Match', { id: apt.id, day: dayStr, time: aptTimeStr });
+      }
+
+      return match;
     });
   };
 
