@@ -57,7 +57,21 @@ export function WeeklyCalendar({ appointments, patients, doctors, onEditAppointm
     return appointments.filter(apt => {
       const aptDate = parseISO(apt.data_agendamento);
       const aptTime = format(aptDate, 'HH:mm');
-      return isSameDay(aptDate, day) && aptTime === time;
+      const isSameDayResult = isSameDay(aptDate, day);
+      
+      // Debug logs
+      console.log('Checking appointment:', {
+        id: apt.id,
+        data_agendamento: apt.data_agendamento,
+        aptDate: aptDate.toISOString(),
+        aptTime,
+        dayToCompare: day.toISOString(),
+        timeSlot: time,
+        isSameDay: isSameDayResult,
+        matches: isSameDayResult && aptTime === time
+      });
+      
+      return isSameDayResult && aptTime === time;
     });
   };
 
