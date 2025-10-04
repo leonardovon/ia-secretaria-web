@@ -1,16 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { MessageSquare, Hospital } from 'lucide-react';
+import { Hospital } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const TestSection = () => {
-  const handleWhatsAppTest = () => {
-    // This will be updated with the actual WhatsApp link when the demo clinic is ready
-    window.open('https://wa.me/5548984141354?text=Olá! Gostaria de informações sobre a clínica', '_blank');
-  };
-
-  const handleDemoRequest = () => {
-      window.open('https://wa.me/5548984141354?text=Olá! Gostaria de testar o atendimento da IA Secretária', '_blank');
-  };
+  const navigate = useNavigate();
 
   return (
     <section id="teste" className="py-20 bg-gradient-hero">
@@ -39,29 +33,16 @@ const TestSection = () => {
               Teste todas as funcionalidades em nossa clínica fictícia
             </p>
             <Button 
-              onClick={handleWhatsAppTest}
+              onClick={() => navigate('/demo')}
               className="whatsapp-button text-white px-6 py-3 rounded-full font-semibold inline-flex items-center gap-2 transition-all duration-300"
             >
-              <MessageSquare className="w-5 h-5" />
-              Testar no WhatsApp
+              Conhecer Agora
             </Button>
             <p className="text-sm text-muted-foreground mt-4">
               * Ambiente de demonstração - todas as funcionalidades ativas
             </p>
           </CardContent>
         </Card>
-
-        <div className="text-center">
-          <h3 className="text-2xl font-semibold mb-4 text-foreground">
-            Pronto para Implementar?
-          </h3>
-          <Button 
-            onClick={handleDemoRequest}
-            className="bg-gradient-primary hover:opacity-90 text-primary-foreground px-8 py-4 text-lg font-semibold rounded-full shadow-elegant hover-lift transition-all duration-300"
-          >
-            Solicitar Demonstração Personalizada
-          </Button>
-        </div>
       </div>
     </section>
   );
