@@ -58,6 +58,74 @@ const Demo = () => {
             </CardContent>
           </Card>
 
+          <Card className="mb-8 shadow-card">
+            <CardHeader>
+              <CardTitle className="text-2xl">Sobre a Clínica Girassol (Demo)</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                Esta é a clínica fictícia que você poderá interagir através do WhatsApp. Utilize as informações abaixo para testar os agendamentos:
+              </p>
+              
+              <div className="grid md:grid-cols-2 gap-4 mt-6">
+                <div>
+                  <h4 className="font-semibold mb-2">📋 Especialidades</h4>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• Clínica Médica</li>
+                    <li>• Pediatria</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold mb-2">👨‍⚕️ Médicos Disponíveis</h4>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• Dr. André Moreira (Clínica Médica)</li>
+                    <li>• Dra. Carolina Santos (Pediatria)</li>
+                    <li>• Dr. Ricardo Lima (Clínica Médica)</li>
+                    <li>• Dra. Juliana Oliveira (Pediatria)</li>
+                    <li>• Dr. Fernando Silva (Clínica Médica)</li>
+                    <li>• Dra. Mariana Rodrigues (Pediatria)</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold mb-2">🕒 Horário de Funcionamento</h4>
+                  <p className="text-sm text-muted-foreground">Segunda a Sexta: 7h às 19h</p>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold mb-2">📍 Localização</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Rua das Flores, 456<br />
+                    Centro - São Paulo/SP<br />
+                    CEP: 01234-567
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold mb-2">📞 Contatos</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Tel: (11) 3456-7890<br />
+                    WhatsApp: (11) 99988-7766
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold mb-2">✉️ E-mail</h4>
+                  <p className="text-sm text-muted-foreground">
+                    contato@clinicagirassol.com.br
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-muted/50 p-4 rounded-lg mt-6">
+                <p className="text-sm text-muted-foreground">
+                  <strong>💡 Dica:</strong> Ao conversar com a IA no WhatsApp, você pode solicitar agendamentos mencionando qualquer um dos médicos ou especialidades listadas acima. Teste diferentes cenários!
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card className="mb-8 shadow-card bg-card">
             <CardContent className="p-8 text-center">
               <h3 className="text-2xl font-semibold mb-4 text-foreground">
