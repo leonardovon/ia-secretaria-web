@@ -113,11 +113,12 @@ const Demo = () => {
                 <div className="border-l-4 border-primary pl-4">
                   <h4 className="font-semibold mb-2">🎯 Funcionalidades Principais</h4>
                   <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• <strong>Agendamento:</strong> Marca consultas considerando disponibilidade de médicos</li>
+                    <li>• <strong>Agendamento:</strong> Marca consultas considerando disponibilidade de médicos e convênios</li>
                     <li>• <strong>Reagendamento:</strong> Altera horários de forma automática</li>
                     <li>• <strong>Cancelamento:</strong> Processa cancelamentos e libera horários</li>
                     <li>• <strong>Confirmações:</strong> Envia lembretes e confirma presença</li>
-                    <li>• <strong>Informações:</strong> Responde dúvidas sobre localização, horários e especialidades</li>
+                    <li>• <strong>Informações:</strong> Responde dúvidas sobre localização, horários, especialidades e convênios</li>
+                    <li>• <strong>Validação:</strong> Verifica convênios aceitos (Unimed e Bradesco Saúde)</li>
                   </ul>
                 </div>
               </div>
@@ -145,6 +146,8 @@ const Demo = () => {
                   <ul className="text-sm text-muted-foreground space-y-1">
                     <li>• Clínica Médica</li>
                     <li>• Pediatria</li>
+                    <li>• Cardiologia</li>
+                    <li>• Dermatologia</li>
                   </ul>
                 </div>
 
@@ -153,8 +156,8 @@ const Demo = () => {
                   <ul className="text-sm text-muted-foreground space-y-1">
                     <li>• Dr. André Moreira (Clínica Médica)</li>
                     <li>• Dra. Carolina Santos (Pediatria)</li>
-                    <li>• Dr. Ricardo Lima (Clínica Médica)</li>
-                    <li>• Dra. Juliana Oliveira (Pediatria)</li>
+                    <li>• Dr. Ricardo Lima (Cardiologia)</li>
+                    <li>• Dra. Juliana Oliveira (Dermatologia)</li>
                     <li>• Dr. Fernando Silva (Clínica Médica)</li>
                     <li>• Dra. Mariana Rodrigues (Pediatria)</li>
                   </ul>
@@ -162,7 +165,20 @@ const Demo = () => {
 
                 <div>
                   <h4 className="font-semibold mb-2">🕒 Horário de Funcionamento</h4>
-                  <p className="text-sm text-muted-foreground">Segunda a Sexta: 7h às 19h</p>
+                  <p className="text-sm text-muted-foreground">
+                    Segunda a Sexta: 7h às 19h<br />
+                    Sábado: 8h às 12h
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold mb-2">🏥 Convênios Aceitos</h4>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• Unimed</li>
+                    <li>• Bradesco Saúde</li>
+                    <li>• Particular</li>
+                  </ul>
+                  <p className="text-xs text-muted-foreground mt-2">* Não atendemos pelo SUS</p>
                 </div>
 
                 <div>
