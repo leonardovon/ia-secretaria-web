@@ -17,6 +17,11 @@ const FeaturesSection = () => {
       icon: MessageSquare,
       title: "WhatsApp Integrado",
       description: "Funciona diretamente no WhatsApp da sua clínica, onde os pacientes já estão acostumados a se comunicar"
+    },
+    {
+      icon: Bot,
+      title: "API",
+      description: "Integração completa com seu CRM ou Sistema de Prontuário Eletrônico através de API, permitindo sincronização automática de dados e fluxos personalizados"
     }
   ];
 
