@@ -259,6 +259,27 @@ export type Database = {
       }
     }
     Views: {
+      clinica_documents: {
+        Row: {
+          content: string | null
+          embedding: string | null
+          id: number | null
+          metadata: Json | null
+        }
+        Insert: {
+          content?: string | null
+          embedding?: string | null
+          id?: number | null
+          metadata?: Json | null
+        }
+        Update: {
+          content?: string | null
+          embedding?: string | null
+          id?: number | null
+          metadata?: Json | null
+        }
+        Relationships: []
+      }
       imobiliaria_documents: {
         Row: {
           content: string | null
