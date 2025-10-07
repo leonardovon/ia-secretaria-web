@@ -1,1 +1,7 @@
 project_id = "ononwldrcvretdjflyjk"
+
+[api]
+# Enable "clinica" schema in addition to the default "public" schema
+schemas = ["public", "graphql_public", "imob", "clinica"]
+# Extra search path for schemas (used for functions, etc.)
+extra_search_path = ["public", "clinica"]
