@@ -261,18 +261,21 @@ export type Database = {
     Views: {
       clinica_documents: {
         Row: {
+          clinic_id: string | null
           content: string | null
           embedding: string | null
           id: number | null
           metadata: Json | null
         }
         Insert: {
+          clinic_id?: string | null
           content?: string | null
           embedding?: string | null
           id?: number | null
           metadata?: Json | null
         }
         Update: {
+          clinic_id?: string | null
           content?: string | null
           embedding?: string | null
           id?: number | null
