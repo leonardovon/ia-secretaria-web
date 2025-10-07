@@ -58,7 +58,7 @@ interface Doctor {
 }
 
 export default function Agendamentos() {
-  const { logout } = useAuth();
+  const { logout, userData } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
@@ -116,7 +116,7 @@ export default function Agendamentos() {
     mutationFn: async (newAppointment: Omit<Appointment, 'id' | 'created_at'>) => {
       const { data, error } = await supabase
         .from('agendamentos')
-        .insert([newAppointment])
+        .insert([{ ...newAppointment, clinic_id: userData?.clinicId }])
         .select()
         .single();
       

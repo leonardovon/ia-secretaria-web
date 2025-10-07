@@ -35,7 +35,7 @@ interface Patient {
 }
 
 export default function Pacientes() {
-  const { logout } = useAuth();
+  const { logout, userData } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
@@ -64,7 +64,7 @@ export default function Pacientes() {
     mutationFn: async (newPatient: Omit<Patient, 'id' | 'created_at'>) => {
       const { data, error } = await supabase
         .from('pacientes')
-        .insert([newPatient])
+        .insert([{ ...newPatient, clinic_id: userData?.clinicId }])
         .select()
         .single();
       
