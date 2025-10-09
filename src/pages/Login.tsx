@@ -36,7 +36,7 @@ export default function Login() {
       const validatedData = loginSchema.parse({ username, password });
       setIsLoading(true);
 
-      const result = await login(validatedData.username.toLowerCase(), validatedData.password);
+      const result = await login(validatedData.username, validatedData.password);
 
       if (result.success) {
         toast({
@@ -86,7 +86,7 @@ export default function Login() {
                 id="username"
                 type="text"
                 value={username}
-                onChange={(e) => setUsername(e.target.value.toLowerCase())}
+                onChange={(e) => setUsername(e.target.value)}
                 placeholder="Digite seu usuário"
                 disabled={isLoading}
                 className="h-11"

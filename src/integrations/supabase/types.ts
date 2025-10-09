@@ -259,30 +259,6 @@ export type Database = {
       }
     }
     Views: {
-      clinica_documents: {
-        Row: {
-          clinic_id: string | null
-          content: string | null
-          embedding: string | null
-          id: number | null
-          metadata: Json | null
-        }
-        Insert: {
-          clinic_id?: string | null
-          content?: string | null
-          embedding?: string | null
-          id?: number | null
-          metadata?: Json | null
-        }
-        Update: {
-          clinic_id?: string | null
-          content?: string | null
-          embedding?: string | null
-          id?: number | null
-          metadata?: Json | null
-        }
-        Relationships: []
-      }
       imobiliaria_documents: {
         Row: {
           content: string | null
@@ -308,32 +284,11 @@ export type Database = {
     Functions: {
       authenticate_clinic_user: {
         Args: { p_password: string; p_username: string }
-        Returns: {
-          clinic_id: string
-          full_name: string
-          role: string
-          success: boolean
-          user_id: string
-          username: string
-        }[]
+        Returns: boolean
       }
       binary_quantize: {
         Args: { "": string } | { "": unknown }
         Returns: unknown
-      }
-      create_user_account: {
-        Args: {
-          p_clinic_id: string
-          p_full_name: string
-          p_password_hash: string
-          p_role: string
-          p_username: string
-        }
-        Returns: string
-      }
-      delete_user_account: {
-        Args: { p_account_id: string }
-        Returns: boolean
       }
       get_clinica_chats: {
         Args: Record<PropertyKey, never>
@@ -348,18 +303,6 @@ export type Database = {
       }
       get_clinica_config: {
         Args: Record<PropertyKey, never>
-        Returns: {
-          created_at: string
-          endereco: string
-          id: string
-          login: string
-          nome_clinica: string
-          telefone: string
-          updated_at: string
-        }[]
-      }
-      get_clinica_config_by_id: {
-        Args: { p_clinic_id: string }
         Returns: {
           created_at: string
           endereco: string
@@ -434,27 +377,6 @@ export type Database = {
       l2_normalize: {
         Args: { "": string } | { "": unknown } | { "": unknown }
         Returns: string
-      }
-      list_clinicas: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          endereco: string
-          id: string
-          nome_clinica: string
-          telefone: string
-        }[]
-      }
-      list_user_accounts: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          clinic_id: string
-          created_at: string
-          full_name: string
-          id: string
-          is_active: boolean
-          role: string
-          username: string
-        }[]
       }
       match_documents: {
         Args: { filter?: Json; match_count?: number; query_embedding: string }

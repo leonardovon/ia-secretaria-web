@@ -1,4 +1,4 @@
-import { Bot, Calendar, MessageSquare, Plug } from 'lucide-react';
+import { Bot, Calendar, MessageSquare } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 
 const FeaturesSection = () => {
@@ -17,11 +17,6 @@ const FeaturesSection = () => {
       icon: MessageSquare,
       title: "WhatsApp Integrado",
       description: "Funciona diretamente no WhatsApp da sua clínica, onde os pacientes já estão acostumados a se comunicar"
-    },
-    {
-      icon: Plug,
-      title: "API",
-      description: "Integração completa com seu CRM ou Sistema de Prontuário Eletrônico através de API, permitindo sincronização automática de dados e fluxos personalizados"
     }
   ];
 
@@ -31,7 +26,7 @@ const FeaturesSection = () => {
         <h2 className="text-3xl md:text-5xl font-bold text-center mb-16 text-foreground">
           Como Funciona
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-3 gap-8">
           {features.map((feature, index) => (
             <Card 
               key={index}

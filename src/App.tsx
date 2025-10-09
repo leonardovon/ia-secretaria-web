@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import Index from "./pages/Index";
-import Demo from "./pages/Demo";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
@@ -14,7 +13,6 @@ import Messages from "./pages/Messages";
 import Pacientes from "./pages/Pacientes";
 import Agendamentos from "./pages/Agendamentos";
 import Configuracoes from "./pages/Configuracoes";
-import GestaoContas from "./pages/GestaoContas";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,7 +26,6 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/demo" element={<Demo />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
             <Route
@@ -63,16 +60,14 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
-            <Route path="/configuracoes" element={
-              <ProtectedRoute>
-                <Configuracoes />
-              </ProtectedRoute>
-            } />
-            <Route path="/gestao-contas" element={
-              <ProtectedRoute>
-                <GestaoContas />
-              </ProtectedRoute>
-            } />
+            <Route 
+              path="/configuracoes" 
+              element={
+                <ProtectedRoute>
+                  <Configuracoes />
+                </ProtectedRoute>
+              } 
+            />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
