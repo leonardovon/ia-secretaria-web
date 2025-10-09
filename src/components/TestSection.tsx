@@ -1,15 +1,21 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { MessageSquare, Hospital } from 'lucide-react';
+import { MessageSquare, Hospital, LogIn } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const TestSection = () => {
+  const navigate = useNavigate();
+
   const handleWhatsAppTest = () => {
-    // This will be updated with the actual WhatsApp link when the demo clinic is ready
     window.open('https://wa.me/5548984141354?text=Olá! Gostaria de informações sobre a clínica', '_blank');
   };
 
+  const handleClinicAccess = () => {
+    navigate('/login');
+  };
+
   const handleDemoRequest = () => {
-      window.open('https://wa.me/5548984141354?text=Olá! Gostaria de testar o atendimento da IA Secretária', '_blank');
+    window.open('https://wa.me/5548984141354?text=Olá! Gostaria de testar o atendimento da IA Secretária', '_blank');
   };
 
   return (
@@ -27,29 +33,55 @@ const TestSection = () => {
         <p className="text-muted-foreground mb-6 text-xl">
             Acompanhe o atendimento no back-end da clínica, mensagens trocadas, agendamentos, notificações, etc
         </p>
-        <Card className="max-w-lg mx-auto mb-12 shadow-card hover-lift bg-card">
-          <CardContent className="p-8 text-center">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Hospital className="w-6 h-6 text-primary" />
-              <h3 className="text-xl font-semibold text-foreground">
-                Clínica Demo
-              </h3>
-            </div>
-            <p className="text-muted-foreground mb-6">
-              Teste todas as funcionalidades em nossa clínica fictícia
-            </p>
-            <Button 
-              onClick={handleWhatsAppTest}
-              className="whatsapp-button text-white px-6 py-3 rounded-full font-semibold inline-flex items-center gap-2 transition-all duration-300"
-            >
-              <MessageSquare className="w-5 h-5" />
-              Testar no WhatsApp
-            </Button>
-            <p className="text-sm text-muted-foreground mt-4">
-              * Ambiente de demonstração - todas as funcionalidades ativas
-            </p>
-          </CardContent>
-        </Card>
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
+          <Card className="shadow-card hover-lift bg-card">
+            <CardContent className="p-8 text-center">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Hospital className="w-6 h-6 text-primary" />
+                <h3 className="text-xl font-semibold text-foreground">
+                  Clínica Girassol
+                </h3>
+              </div>
+              <p className="text-muted-foreground mb-6">
+                Acesse a área administrativa da clínica demo
+              </p>
+              <Button 
+                onClick={handleClinicAccess}
+                className="bg-gradient-primary hover:opacity-90 text-primary-foreground px-6 py-3 rounded-full font-semibold inline-flex items-center gap-2 transition-all duration-300 w-full"
+              >
+                <LogIn className="w-5 h-5" />
+                Acessar Sistema
+              </Button>
+              <p className="text-sm text-muted-foreground mt-4">
+                Usuário: <strong>von</strong> | Senha: <strong>von123</strong>
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-card hover-lift bg-card">
+            <CardContent className="p-8 text-center">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <MessageSquare className="w-6 h-6 text-primary" />
+                <h3 className="text-xl font-semibold text-foreground">
+                  Teste via WhatsApp
+                </h3>
+              </div>
+              <p className="text-muted-foreground mb-6">
+                Converse com o agente inteligente da clínica
+              </p>
+              <Button 
+                onClick={handleWhatsAppTest}
+                className="whatsapp-button text-white px-6 py-3 rounded-full font-semibold inline-flex items-center gap-2 transition-all duration-300 w-full"
+              >
+                <MessageSquare className="w-5 h-5" />
+                Testar no WhatsApp
+              </Button>
+              <p className="text-sm text-muted-foreground mt-4">
+                * Ambiente de demonstração completo
+              </p>
+            </CardContent>
+          </Card>
+        </div>
 
         <div className="text-center">
           <h3 className="text-2xl font-semibold mb-4 text-foreground">
