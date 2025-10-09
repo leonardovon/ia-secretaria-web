@@ -1,12 +1,19 @@
 // Tipos compartilhados entre edge functions
 
 export interface AgendamentoRequest {
-  action: 'criar' | 'consultar' | 'remarcar' | 'cancelar';
+  action: 'criar' | 'consultar' | 'remarcar' | 'cancelar' | 'listar_medicos' | 'listar_pacientes' | 'criar_medico' | 'criar_paciente';
   clinic_id?: string;
   paciente?: {
+    id?: string;
     nome: string;
     telefone: string;
     data_nascimento: string;
+  };
+  medico?: {
+    id?: string;
+    nome: string;
+    especialidade?: string;
+    crm?: string;
   };
   agendamento?: {
     id?: string;
