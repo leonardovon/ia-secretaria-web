@@ -19,7 +19,7 @@ Authorization: Bearer <seu-token>
 ## Parâmetros Obrigatórios
 
 - `clinic_id` (string, UUID): ID da clínica no schema `clinica.config`
-- `action` (string): Ação a ser executada: `criar`, `consultar`, `remarcar`, `cancelar`, `listar_medicos`, `listar_pacientes`, `criar_medico`, `criar_paciente`
+- `action` (string): Ação a ser executada: `criar`, `consultar`, `remarcar`, `cancelar`
 
 ## Ações Disponíveis
 
@@ -97,95 +97,6 @@ Authorization: Bearer <seu-token>
   }
 }
 ```
-
-### 5. Listar Médicos
-
-```json
-{
-  "action": "listar_medicos",
-  "clinic_id": "uuid-da-clinica"
-}
-```
-
-**Resposta:**
-```json
-{
-  "success": true,
-  "message": "5 médico(s) encontrado(s)",
-  "data": [
-    {
-      "id": "uuid",
-      "nome": "Dr. João Silva",
-      "especialidade": "Oftalmologia",
-      "crm": "12345-SC",
-      "created_at": "2025-01-01T00:00:00Z"
-    }
-  ]
-}
-```
-
-### 6. Listar Pacientes
-
-```json
-{
-  "action": "listar_pacientes",
-  "clinic_id": "uuid-da-clinica"
-}
-```
-
-**Resposta:**
-```json
-{
-  "success": true,
-  "message": "10 paciente(s) encontrado(s)",
-  "data": [
-    {
-      "id": "uuid",
-      "nome": "Maria Santos",
-      "telefone": "5548991234567",
-      "data_nascimento": "1990-05-15",
-      "created_at": "2025-01-01T00:00:00Z"
-    }
-  ]
-}
-```
-
-### 7. Criar Médico
-
-```json
-{
-  "action": "criar_medico",
-  "clinic_id": "uuid-da-clinica",
-  "medico": {
-    "nome": "Dr. João Silva",
-    "especialidade": "Oftalmologia",
-    "crm": "12345-SC"
-  }
-}
-```
-
-**Notas:**
-- Apenas o nome é obrigatório
-- Especialidade e CRM são opcionais
-
-### 8. Criar Paciente
-
-```json
-{
-  "action": "criar_paciente",
-  "clinic_id": "uuid-da-clinica",
-  "paciente": {
-    "nome": "Maria Santos",
-    "telefone": "(48) 99123-4567",
-    "data_nascimento": "1990-05-15"
-  }
-}
-```
-
-**Notas:**
-- Todos os campos são obrigatórios
-- Telefone será sanitizado automaticamente
-- Não permite criar pacientes com telefone duplicado
 
 ## Respostas
 
