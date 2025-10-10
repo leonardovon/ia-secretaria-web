@@ -53,9 +53,6 @@ const TestSection = () => {
                 Acessar Sistema
                 </Button>
                 <p className="text-sm text-muted-foreground mt-4">
-                    Usuário: <strong>teste</strong> | Senha: <strong>123teste</strong>
-                </p>
-                <p className="text-sm text-muted-foreground mt-4">
                     * Ambiente de demonstração completo
                 </p>
               
