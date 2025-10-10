@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface AuthContextType {
   isAuthenticated: boolean;
+  username: string | null;
   login: (username: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   isLoading: boolean;
@@ -12,12 +13,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('clinic_auth_token');
     if (token) {
       setIsAuthenticated(true);
+      setUsername(token);
     }
     setIsLoading(false);
   }, []);
@@ -41,6 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       localStorage.setItem('clinic_auth_token', username);
       setIsAuthenticated(true);
+      setUsername(username);
       return { success: true };
     } catch (err) {
       console.error('Login exception:', err);
@@ -51,10 +55,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     localStorage.removeItem('clinic_auth_token');
     setIsAuthenticated(false);
+    setUsername(null);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ isAuthenticated, username, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
