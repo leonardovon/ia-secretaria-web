@@ -38,7 +38,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: 'Erro ao fazer login' };
       }
 
-      if (!data) {
+      // Verifica se data é um array válido com resultados
+      if (!data || !Array.isArray(data) || data.length === 0) {
         return { success: false, error: 'Credenciais inválidas' };
       }
 
