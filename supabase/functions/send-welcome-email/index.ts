@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@4.0.0";
+import { Resend } from "npm:resend@2.0.0";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -29,7 +29,7 @@ const handler = async (req: Request): Promise<Response> => {
     const emailResponse = await resend.emails.send({
       from: "Sistema de Gestão <onboarding@resend.dev>",
       to: [email],
-      subject: "Bem-vindo ao Sistema de Gestão da Clínica!",
+      subject: "Bem-vindo ao Sistema IA-Secretária - Ambiente de Demonstração",
       html: `
         <!DOCTYPE html>
         <html>
@@ -40,18 +40,34 @@ const handler = async (req: Request): Promise<Response> => {
               .container { max-width: 600px; margin: 0 auto; padding: 20px; }
               .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
               .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+              .demo-notice { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 5px; }
               .credentials { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea; }
               .button { display: inline-block; background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
               .footer { text-align: center; margin-top: 30px; color: #666; font-size: 12px; }
+              .highlight { color: #667eea; font-weight: bold; }
             </style>
           </head>
           <body>
             <div class="container">
               <div class="header">
-                <h1>🎉 Bem-vindo!</h1>
+                <h1>🎉 Bem-vindo ao IA-Secretária!</h1>
+                <p style="margin: 10px 0 0 0; font-size: 14px;">Atend Med IA</p>
               </div>
               <div class="content">
                 <h2>Olá, ${name}!</h2>
+                
+                <div class="demo-notice">
+                  <p style="margin: 0;">
+                    🧪 <strong>Ambiente de Demonstração</strong><br><br>
+                    Você está acessando o ambiente de <strong>demonstração</strong> da <span class="highlight">IA-Secretária</span>, 
+                    nossa solução inteligente desenvolvida pela <span class="highlight">Atend Med IA</span> para automatizar e 
+                    otimizar o atendimento em clínicas médicas. Este sistema foi criado especialmente para a 
+                    <span class="highlight">Clínica Girassol</span> como ambiente de testes, permitindo que você explore 
+                    todas as funcionalidades de gestão de pacientes, agendamentos e mensagens de forma segura e prática. 
+                    Sinta-se à vontade para testar todas as funcionalidades disponíveis!
+                  </p>
+                </div>
+
                 <p>Sua conta foi criada com sucesso! Estamos muito felizes em ter você conosco.</p>
                 
                 <div class="credentials">
@@ -71,6 +87,7 @@ const handler = async (req: Request): Promise<Response> => {
               </div>
               <div class="footer">
                 <p>Este é um email automático, por favor não responda.</p>
+                <p style="margin-top: 10px;">© 2025 Atend Med IA - Clínica Girassol</p>
               </div>
             </div>
           </body>
