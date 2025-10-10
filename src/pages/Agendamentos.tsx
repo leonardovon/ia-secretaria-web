@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Plus, Search, Edit, Trash2 } from 'lucide-react';
+import { LogOut, Plus, Search, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import {
@@ -64,6 +64,7 @@ export default function Agendamentos() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
+  const [weekOffset, setWeekOffset] = useState(0);
   const [formData, setFormData] = useState({
     paciente_id: '',
     medico_id: '',
@@ -242,7 +243,7 @@ export default function Agendamentos() {
     const diff = currentDay === 0 ? -6 : 1 - currentDay; // Ajustar para segunda-feira
     
     const monday = new Date(today);
-    monday.setDate(today.getDate() + diff);
+    monday.setDate(today.getDate() + diff + (weekOffset * 7));
     monday.setHours(0, 0, 0, 0);
     
     const weekDays = [];
@@ -252,6 +253,17 @@ export default function Agendamentos() {
       weekDays.push(day);
     }
     return weekDays;
+  };
+
+  const navigateWeek = (direction: 'prev' | 'next') => {
+    setWeekOffset(prev => direction === 'next' ? prev + 1 : prev - 1);
+  };
+
+  const getWeekLabel = () => {
+    const days = getWeekDays();
+    const firstDay = days[0];
+    const lastDay = days[days.length - 1];
+    return `${firstDay.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })} - ${lastDay.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}`;
   };
 
   const generateTimeSlots = () => {
@@ -495,17 +507,47 @@ export default function Agendamentos() {
           <TabsContent value="calendar">
             <Card>
               <CardHeader>
-                <CardTitle>Agenda Semanal</CardTitle>
-                <CardDescription>
-                  Visualização da agenda no estilo Outlook
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Agenda Semanal</CardTitle>
+                    <CardDescription>
+                      {getWeekLabel()}
+                    </CardDescription>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigateWeek('prev')}
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      Semana Anterior
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setWeekOffset(0)}
+                      disabled={weekOffset === 0}
+                    >
+                      Hoje
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigateWeek('next')}
+                    >
+                      Próxima Semana
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 {isLoading ? (
                   <p className="text-center text-muted-foreground py-8">Carregando...</p>
                 ) : (
-                  <ScrollArea className="w-full">
-                    <div className="min-w-[800px]">
+                  <ScrollArea className="w-full h-[600px]">
+                    <div className="min-w-[1000px] pb-4">
                       <div className="grid grid-cols-6 gap-1 border-b pb-2 mb-2">
                         <div className="font-semibold text-sm text-center">Horário</div>
                         {weekDays.map((day, index) => (
