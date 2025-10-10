@@ -506,22 +506,23 @@ export default function Agendamentos() {
 
           <TabsContent value="calendar">
             <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
+              <CardHeader className="pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div>
-                    <CardTitle>Agenda Semanal</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="text-xl">Agenda Semanal</CardTitle>
+                    <CardDescription className="text-sm mt-1">
                       {getWeekLabel()}
                     </CardDescription>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => navigateWeek('prev')}
+                      className="flex-1 sm:flex-initial"
                     >
-                      <ChevronLeft className="w-4 h-4" />
-                      Semana Anterior
+                      <ChevronLeft className="w-4 h-4 sm:mr-1" />
+                      <span className="hidden sm:inline">Semana Anterior</span>
                     </Button>
                     <Button
                       variant="outline"
@@ -535,72 +536,92 @@ export default function Agendamentos() {
                       variant="outline"
                       size="sm"
                       onClick={() => navigateWeek('next')}
+                      className="flex-1 sm:flex-initial"
                     >
-                      Próxima Semana
-                      <ChevronRight className="w-4 h-4" />
+                      <span className="hidden sm:inline">Próxima Semana</span>
+                      <ChevronRight className="w-4 h-4 sm:ml-1" />
                     </Button>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-0">
                 {isLoading ? (
                   <p className="text-center text-muted-foreground py-8">Carregando...</p>
                 ) : (
-                  <ScrollArea className="w-full h-[600px]">
-                    <div className="min-w-[1000px] pb-4">
-                      <div className="grid grid-cols-6 gap-1 border-b pb-2 mb-2">
-                        <div className="font-semibold text-sm text-center">Horário</div>
-                        {weekDays.map((day, index) => (
-                          <div key={index} className="font-semibold text-sm text-center">
-                            {day.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' })}
+                  <div className="relative">
+                    <ScrollArea className="w-full h-[calc(100vh-320px)] min-h-[400px]">
+                      <div className="flex">
+                        {/* Coluna de horários fixa */}
+                        <div className="sticky left-0 z-10 bg-background border-r">
+                          <div className="h-12 border-b flex items-center justify-center px-3 font-semibold text-sm bg-muted/50">
+                            Horário
                           </div>
-                        ))}
-                      </div>
-                      <div className="space-y-1">
-                        {timeSlots.map((slot, slotIndex) => (
-                          <div key={slotIndex} className="grid grid-cols-6 gap-1">
-                            <div className="text-xs font-medium text-muted-foreground py-2 text-center">
-                              {formatTimeSlot(slot.hour, slot.minute)}
-                            </div>
-                            {weekDays.map((day, dayIndex) => {
-                              const appointment = getAppointmentForSlot(day, slot.hour, slot.minute);
-                              return (
-                                <div
-                                  key={dayIndex}
-                                  className={`border rounded p-2 min-h-[60px] text-xs ${
-                                    appointment
-                                      ? appointment.status === 'agendado'
-                                        ? 'bg-blue-50 border-blue-200 hover:bg-blue-100 cursor-pointer'
-                                        : appointment.status === 'confirmado'
-                                        ? 'bg-green-50 border-green-200 hover:bg-green-100 cursor-pointer'
-                                        : appointment.status === 'cancelado'
-                                        ? 'bg-red-50 border-red-200 hover:bg-red-100 cursor-pointer'
-                                        : 'bg-gray-50 border-gray-200 hover:bg-gray-100 cursor-pointer'
-                                      : 'bg-background hover:bg-muted/50 cursor-pointer'
-                                  }`}
-                                  onClick={() => appointment && handleEdit(appointment)}
-                                >
-                                  {appointment ? (
-                                    <div className="space-y-1">
-                                      <div className="font-semibold truncate">
-                                        {getPatientName(appointment.paciente_id)}
-                                      </div>
-                                      <div className="text-muted-foreground truncate">
-                                        {appointment.procedimento}
-                                      </div>
-                                      <div className="text-muted-foreground truncate">
-                                        {getDoctorName(appointment.medico_id)}
-                                      </div>
-                                    </div>
-                                  ) : null}
+                          <div>
+                            {timeSlots.map((slot, slotIndex) => (
+                              <div
+                                key={slotIndex}
+                                className="h-16 border-b flex items-center justify-center px-3 text-xs font-medium text-muted-foreground bg-background"
+                              >
+                                {formatTimeSlot(slot.hour, slot.minute)}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        {/* Colunas dos dias */}
+                        <div className="flex flex-1">
+                          {weekDays.map((day, dayIndex) => (
+                            <div key={dayIndex} className="flex-1 min-w-[140px] border-r last:border-r-0">
+                              <div className="h-12 border-b flex items-center justify-center px-2 font-semibold text-sm bg-muted/50 sticky top-0 z-5">
+                                <div className="text-center">
+                                  <div>{day.toLocaleDateString('pt-BR', { weekday: 'short' })}</div>
+                                  <div className="text-xs text-muted-foreground">
+                                    {day.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+                                  </div>
                                 </div>
-                              );
-                            })}
-                          </div>
-                        ))}
+                              </div>
+                              <div>
+                                {timeSlots.map((slot, slotIndex) => {
+                                  const appointment = getAppointmentForSlot(day, slot.hour, slot.minute);
+                                  return (
+                                    <div
+                                      key={slotIndex}
+                                      className={`h-16 border-b p-1 text-xs transition-colors ${
+                                        appointment
+                                          ? appointment.status === 'agendado'
+                                            ? 'bg-blue-50 hover:bg-blue-100 cursor-pointer'
+                                            : appointment.status === 'confirmado'
+                                            ? 'bg-green-50 hover:bg-green-100 cursor-pointer'
+                                            : appointment.status === 'cancelado'
+                                            ? 'bg-red-50 hover:bg-red-100 cursor-pointer'
+                                            : 'bg-gray-50 hover:bg-gray-100 cursor-pointer'
+                                          : 'hover:bg-muted/30 cursor-pointer'
+                                      }`}
+                                      onClick={() => appointment && handleEdit(appointment)}
+                                    >
+                                      {appointment ? (
+                                        <div className="h-full flex flex-col justify-center gap-0.5 px-1">
+                                          <div className="font-semibold truncate text-[10px] leading-tight">
+                                            {getPatientName(appointment.paciente_id)}
+                                          </div>
+                                          <div className="text-muted-foreground truncate text-[9px] leading-tight">
+                                            {appointment.procedimento}
+                                          </div>
+                                          <div className="text-muted-foreground truncate text-[9px] leading-tight">
+                                            {getDoctorName(appointment.medico_id)}
+                                          </div>
+                                        </div>
+                                      ) : null}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  </ScrollArea>
+                    </ScrollArea>
+                  </div>
                 )}
               </CardContent>
             </Card>
