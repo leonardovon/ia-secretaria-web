@@ -10,6 +10,7 @@ import { LogOut, Save, Building2, Phone, MapPin, User, Lock } from 'lucide-react
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { Textarea } from '@/components/ui/textarea';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { z } from 'zod';
 
 const configSchema = z.object({
@@ -285,15 +286,26 @@ export default function Configuracoes() {
                 </CardContent>
               </Card>
 
-              <Button 
-                type="submit" 
-                size="lg" 
-                className="w-full"
-                disabled={updateMutation.isPending}
-              >
-                <Save className="w-4 h-4 mr-2" />
-                {updateMutation.isPending ? 'Salvando...' : 'Salvar Configurações'}
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="w-full inline-block">
+                      <Button 
+                        type="button" 
+                        size="lg" 
+                        className="w-full"
+                        disabled
+                      >
+                        <Save className="w-4 h-4 mr-2" />
+                        Salvar Configurações
+                      </Button>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Operação não permitida em ambiente simulado</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </form>
           </div>
         )}
