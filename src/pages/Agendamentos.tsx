@@ -33,6 +33,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Appointment {
   id: string;
@@ -233,6 +235,56 @@ export default function Agendamentos() {
     return patientName.includes(query) || doctorName.includes(query) || appointment.procedimento.toLowerCase().includes(query);
   });
 
+  // Funções auxiliares para a visualização semanal
+  const getWeekDays = () => {
+    const today = new Date();
+    const currentDay = today.getDay();
+    const diff = currentDay === 0 ? -6 : 1 - currentDay; // Ajustar para segunda-feira
+    
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + diff);
+    monday.setHours(0, 0, 0, 0);
+    
+    const weekDays = [];
+    for (let i = 0; i < 5; i++) { // Segunda a Sexta
+      const day = new Date(monday);
+      day.setDate(monday.getDate() + i);
+      weekDays.push(day);
+    }
+    return weekDays;
+  };
+
+  const generateTimeSlots = () => {
+    const slots = [];
+    for (let hour = 7; hour <= 19; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        if (hour === 19 && minute > 0) break; // Última consulta é às 19h00
+        slots.push({ hour, minute });
+      }
+    }
+    return slots;
+  };
+
+  const formatTimeSlot = (hour: number, minute: number) => {
+    return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+  };
+
+  const getAppointmentForSlot = (day: Date, hour: number, minute: number) => {
+    return appointments.find(appointment => {
+      const appointmentDate = new Date(appointment.data_agendamento);
+      return (
+        appointmentDate.getFullYear() === day.getFullYear() &&
+        appointmentDate.getMonth() === day.getMonth() &&
+        appointmentDate.getDate() === day.getDate() &&
+        appointmentDate.getHours() === hour &&
+        appointmentDate.getMinutes() === minute
+      );
+    });
+  };
+
+  const weekDays = getWeekDays();
+  const timeSlots = generateTimeSlots();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
       <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
@@ -359,78 +411,159 @@ export default function Agendamentos() {
           </Dialog>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Lista de Agendamentos</CardTitle>
-            <CardDescription>
-              <div className="flex items-center gap-2 mt-2">
-                <Search className="w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar por paciente, médico ou procedimento..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="max-w-sm"
-                />
-              </div>
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <p className="text-center text-muted-foreground py-8">Carregando...</p>
-            ) : filteredAppointments.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">Nenhum agendamento encontrado</p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Paciente</TableHead>
-                    <TableHead>Médico</TableHead>
-                    <TableHead>Procedimento</TableHead>
-                    <TableHead>Data/Hora</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredAppointments.map((appointment) => (
-                    <TableRow key={appointment.id}>
-                      <TableCell className="font-medium">{getPatientName(appointment.paciente_id)}</TableCell>
-                      <TableCell>{getDoctorName(appointment.medico_id)}</TableCell>
-                      <TableCell>{appointment.procedimento}</TableCell>
-                      <TableCell>{new Date(appointment.data_agendamento).toLocaleString('pt-BR')}</TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          appointment.status === 'agendado' ? 'bg-blue-100 text-blue-800' :
-                          appointment.status === 'confirmado' ? 'bg-green-100 text-green-800' :
-                          appointment.status === 'cancelado' ? 'bg-red-100 text-red-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {appointment.status}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEdit(appointment)}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(appointment.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
+        <Tabs defaultValue="list" className="w-full">
+          <TabsList className="grid w-full max-w-md grid-cols-2 mb-4">
+            <TabsTrigger value="list">Lista</TabsTrigger>
+            <TabsTrigger value="calendar">Agenda Semanal</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="list">
+            <Card>
+              <CardHeader>
+                <CardTitle>Lista de Agendamentos</CardTitle>
+                <CardDescription>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Search className="w-4 h-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Buscar por paciente, médico ou procedimento..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="max-w-sm"
+                    />
+                  </div>
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <p className="text-center text-muted-foreground py-8">Carregando...</p>
+                ) : filteredAppointments.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">Nenhum agendamento encontrado</p>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Paciente</TableHead>
+                        <TableHead>Médico</TableHead>
+                        <TableHead>Procedimento</TableHead>
+                        <TableHead>Data/Hora</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredAppointments.map((appointment) => (
+                        <TableRow key={appointment.id}>
+                          <TableCell className="font-medium">{getPatientName(appointment.paciente_id)}</TableCell>
+                          <TableCell>{getDoctorName(appointment.medico_id)}</TableCell>
+                          <TableCell>{appointment.procedimento}</TableCell>
+                          <TableCell>{new Date(appointment.data_agendamento).toLocaleString('pt-BR')}</TableCell>
+                          <TableCell>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              appointment.status === 'agendado' ? 'bg-blue-100 text-blue-800' :
+                              appointment.status === 'confirmado' ? 'bg-green-100 text-green-800' :
+                              appointment.status === 'cancelado' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {appointment.status}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEdit(appointment)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(appointment.id)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="calendar">
+            <Card>
+              <CardHeader>
+                <CardTitle>Agenda Semanal</CardTitle>
+                <CardDescription>
+                  Visualização da agenda no estilo Outlook
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <p className="text-center text-muted-foreground py-8">Carregando...</p>
+                ) : (
+                  <ScrollArea className="w-full">
+                    <div className="min-w-[800px]">
+                      <div className="grid grid-cols-6 gap-1 border-b pb-2 mb-2">
+                        <div className="font-semibold text-sm text-center">Horário</div>
+                        {weekDays.map((day, index) => (
+                          <div key={index} className="font-semibold text-sm text-center">
+                            {day.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' })}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="space-y-1">
+                        {timeSlots.map((slot, slotIndex) => (
+                          <div key={slotIndex} className="grid grid-cols-6 gap-1">
+                            <div className="text-xs font-medium text-muted-foreground py-2 text-center">
+                              {formatTimeSlot(slot.hour, slot.minute)}
+                            </div>
+                            {weekDays.map((day, dayIndex) => {
+                              const appointment = getAppointmentForSlot(day, slot.hour, slot.minute);
+                              return (
+                                <div
+                                  key={dayIndex}
+                                  className={`border rounded p-2 min-h-[60px] text-xs ${
+                                    appointment
+                                      ? appointment.status === 'agendado'
+                                        ? 'bg-blue-50 border-blue-200 hover:bg-blue-100 cursor-pointer'
+                                        : appointment.status === 'confirmado'
+                                        ? 'bg-green-50 border-green-200 hover:bg-green-100 cursor-pointer'
+                                        : appointment.status === 'cancelado'
+                                        ? 'bg-red-50 border-red-200 hover:bg-red-100 cursor-pointer'
+                                        : 'bg-gray-50 border-gray-200 hover:bg-gray-100 cursor-pointer'
+                                      : 'bg-background hover:bg-muted/50 cursor-pointer'
+                                  }`}
+                                  onClick={() => appointment && handleEdit(appointment)}
+                                >
+                                  {appointment ? (
+                                    <div className="space-y-1">
+                                      <div className="font-semibold truncate">
+                                        {getPatientName(appointment.paciente_id)}
+                                      </div>
+                                      <div className="text-muted-foreground truncate">
+                                        {appointment.procedimento}
+                                      </div>
+                                      <div className="text-muted-foreground truncate">
+                                        {getDoctorName(appointment.medico_id)}
+                                      </div>
+                                    </div>
+                                  ) : null}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </ScrollArea>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
