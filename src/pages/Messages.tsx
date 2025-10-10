@@ -32,6 +32,17 @@ export default function Messages() {
   const [searchQuery, setSearchQuery] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Função para limpar e formatar telefone
+  const cleanPhone = (phone: string) => {
+    return phone.replace('@s.whatsapp.net', '').replace('@c.us', '');
+  };
+
+  // Função para formatar nome
+  const getDisplayName = (chat: Chat) => {
+    if (chat.patient_name) return chat.patient_name;
+    return chat.nomewpp.replace('@s.whatsapp.net', '').replace('@c.us', '');
+  };
+
   useEffect(() => {
     fetchChats();
   }, []);
@@ -116,13 +127,13 @@ export default function Messages() {
             >
               <Avatar className="h-12 w-12 bg-primary/10">
                 <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                  {(chat.patient_name || chat.nomewpp).charAt(0).toUpperCase()}
+                  {getDisplayName(chat).charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-baseline">
                   <h3 className="font-semibold text-foreground truncate">
-                    {chat.patient_name || chat.nomewpp}
+                    {getDisplayName(chat)}
                   </h3>
                   <span className="text-xs text-muted-foreground">
                     {new Date(chat.last_message_time).toLocaleTimeString('pt-BR', {
@@ -131,7 +142,7 @@ export default function Messages() {
                     })}
                   </span>
                 </div>
-                <p className="text-sm text-muted-foreground truncate">{chat.phone}</p>
+                <p className="text-sm text-muted-foreground truncate">{cleanPhone(chat.phone)}</p>
                 <p className="text-sm text-muted-foreground truncate mt-1">{chat.last_message}</p>
               </div>
             </div>
@@ -148,14 +159,14 @@ export default function Messages() {
               <div className="flex items-center gap-3">
                 <Avatar className="h-10 w-10 bg-primary/10">
                   <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                    {(selectedChatData?.patient_name || selectedChatData?.nomewpp || '?').charAt(0).toUpperCase()}
+                    {selectedChatData ? getDisplayName(selectedChatData).charAt(0).toUpperCase() : '?'}
                   </AvatarFallback>
                 </Avatar>
                 <div>
                   <h2 className="font-medium text-foreground">
-                    {selectedChatData?.patient_name || selectedChatData?.nomewpp}
+                    {selectedChatData ? getDisplayName(selectedChatData) : ''}
                   </h2>
-                  <p className="text-xs text-muted-foreground">{selectedChat}</p>
+                  <p className="text-xs text-muted-foreground">{selectedChat ? cleanPhone(selectedChat) : ''}</p>
                 </div>
               </div>
             </div>
