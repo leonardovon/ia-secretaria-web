@@ -67,7 +67,21 @@ export default function Messages() {
       return;
     }
 
-    setChats(data || []);
+    // Dedupe por telefone (limpo) mantendo a conversa mais recente
+    const byPhone = new Map<string, Chat>();
+    (data || []).forEach((c: Chat) => {
+      const key = cleanPhone(c.phone);
+      const existing = byPhone.get(key);
+      if (!existing || new Date(c.last_message_time) > new Date(existing.last_message_time)) {
+        byPhone.set(key, c);
+      }
+    });
+
+    const uniqueChats = Array.from(byPhone.values()).sort(
+      (a, b) => new Date(b.last_message_time).getTime() - new Date(a.last_message_time).getTime()
+    );
+
+    setChats(uniqueChats);
   };
 
   const fetchMessages = async (phone: string) => {
