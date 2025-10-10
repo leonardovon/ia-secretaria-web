@@ -41,7 +41,7 @@ export default function SignUp() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard');
+      navigate('/demo');
     }
   }, [isAuthenticated, navigate]);
 
@@ -66,9 +66,8 @@ export default function SignUp() {
       };
       setIsLoading(true);
 
-
-      // Criar nova configuração
-      const { error } = await supabase.rpc('update_clinica_config', {
+      // 1. Criar configuração da clínica
+      const { data: configData, error: configError } = await supabase.rpc('update_clinica_config', {
         p_nome_clinica: validatedData.nome_clinica,
         p_telefone: validatedData.telefone,
         p_endereco: validatedData.endereco || null,
@@ -76,19 +75,61 @@ export default function SignUp() {
         p_senha_hash: validatedData.senha,
       });
 
-      if (error) {
-        console.error('Erro ao criar conta:', error);
+      if (configError || !configData || configData.length === 0) {
+        console.error('Erro ao criar configuração:', configError);
         toast({
           title: 'Erro ao criar conta',
-          description: 'Não foi possível criar a conta. Tente novamente.',
+          description: 'Não foi possível criar a configuração da clínica.',
           variant: 'destructive',
         });
         return;
       }
 
+      const clinicId = configData[0].id;
+
+      // 2. Criar conta de usuário
+      const { data: userId, error: userError } = await supabase.rpc(
+        'create_user_account' as any,
+        {
+          p_clinic_id: clinicId,
+          p_username: validatedData.login,
+          p_password_hash: validatedData.senha,
+          p_full_name: validatedData.nome_clinica,
+          p_role: 'admin'
+        }
+      );
+
+      if (userError) {
+        console.error('Erro ao criar usuário:', userError);
+        toast({
+          title: 'Erro ao criar conta',
+          description: 'Não foi possível criar a conta de usuário.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // 3. Enviar email de boas-vindas
+      const loginUrl = `${window.location.origin}/login`;
+      
+      const emailResult = await supabase.functions.invoke('send-welcome-email', {
+        body: {
+          name: validatedData.nome_clinica,
+          email: validatedData.email,
+          login: validatedData.login,
+          password: validatedData.senha,
+          loginUrl: loginUrl
+        }
+      });
+
+      if (emailResult.error) {
+        console.error('Erro ao enviar email:', emailResult.error);
+        // Não bloqueia o cadastro se o email falhar
+      }
+
       toast({
         title: 'Conta criada com sucesso!',
-        description: 'Você já pode fazer login no sistema.',
+        description: 'Verifique seu email para as credenciais de acesso.',
       });
       
       navigate('/login');

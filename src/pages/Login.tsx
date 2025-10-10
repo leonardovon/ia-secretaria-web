@@ -25,7 +25,7 @@ export default function Login() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard');
+      navigate('/demo');
     }
   }, [isAuthenticated, navigate]);
 
@@ -43,7 +43,7 @@ export default function Login() {
           title: 'Login realizado com sucesso',
           description: 'Bem-vindo ao sistema!',
         });
-        navigate('/dashboard');
+        navigate('/demo');
       } else {
         toast({
           title: 'Erro no login',

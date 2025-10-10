@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MessageSquare, ArrowLeft, Calendar, Users, Bell } from 'lucide-react';
+import { MessageSquare, ArrowLeft, Calendar, Users, Bell, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Demo = () => {
@@ -219,25 +219,85 @@ const Demo = () => {
               <CardTitle>Acesso ao Painel Administrativo</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Após testar o WhatsApp, acesse o painel da clínica para ver:
+              <p className="text-muted-foreground mb-6">
+                Após testar o WhatsApp, acesse as funcionalidades administrativas da clínica:
               </p>
-              <ul className="space-y-2 text-muted-foreground mb-6">
-                <li>• Agendamentos criados pela IA</li>
-                <li>• Histórico de conversas</li>
-                <li>• Dados dos pacientes cadastrados</li>
-                <li>• Relatórios e estatísticas</li>
-              </ul>
-              <Button 
-                onClick={() => navigate('/login')}
-                variant="outline"
-                className="w-full"
-              >
-                Acessar Painel Demo
-              </Button>
-              <p className="text-sm text-muted-foreground mt-2 text-center">
-                Credenciais de demonstração disponíveis na página de login
-              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2">
+                  <CardHeader>
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-2">
+                      <MessageSquare className="w-6 h-6 text-primary" />
+                    </div>
+                    <CardTitle className="text-lg">Mensagens</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Visualize todas as conversas do atendimento
+                    </p>
+                    <Button variant="outline" size="sm" className="w-full" onClick={() => navigate('/messages')}>
+                      Acessar
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2">
+                  <CardHeader>
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-2">
+                      <Users className="w-6 h-6 text-primary" />
+                    </div>
+                    <CardTitle className="text-lg">Pacientes</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Gerencie o cadastro de pacientes
+                    </p>
+                    <Button variant="outline" size="sm" className="w-full" onClick={() => navigate('/pacientes')}>
+                      Acessar
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2">
+                  <CardHeader>
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-2">
+                      <Calendar className="w-6 h-6 text-primary" />
+                    </div>
+                    <CardTitle className="text-lg">Agendamentos</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Visualize e gerencie os agendamentos
+                    </p>
+                    <Button variant="outline" size="sm" className="w-full" onClick={() => navigate('/agendamentos')}>
+                      Acessar
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2">
+                  <CardHeader>
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-2">
+                      <Settings className="w-6 h-6 text-primary" />
+                    </div>
+                    <CardTitle className="text-lg">Configurações</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Configure os dados da clínica
+                    </p>
+                    <Button variant="outline" size="sm" className="w-full" onClick={() => navigate('/configuracoes')}>
+                      Acessar
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <p className="text-sm text-muted-foreground text-center">
+                  💡 <strong>Dica:</strong> Faça login para acessar todas as funcionalidades administrativas
+                </p>
+              </div>
             </CardContent>
           </Card>
         </div>
