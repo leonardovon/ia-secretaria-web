@@ -95,7 +95,8 @@ export default function SignUp() {
           p_username: validatedData.login,
           p_password_hash: validatedData.senha,
           p_full_name: validatedData.nome_clinica,
-          p_role: 'admin'
+          p_role: 'admin',
+          p_email: validatedData.email
         }
       );
 
