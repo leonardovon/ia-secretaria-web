@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MessageSquare, ArrowLeft, Calendar, Users, Bell } from 'lucide-react';
+import { MessageSquare, ArrowLeft, Calendar, Users, Bell, ChefHat, PhoneCall } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Demo = () => {
@@ -23,11 +23,11 @@ const Demo = () => {
         </Button>
 
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold text-center mb-4 text-foreground">
-            Experimente Nossa Clínica Demo
+          <h1 className="text-3xl md:text-4xl font-bold text-center mb-4 text-foreground">
+            Experimente Nosso Agente de Atendimento
           </h1>
           <p className="text-xl text-center mb-12 text-muted-foreground">
-            Teste todas as funcionalidades da IA Secretária em ambiente real
+            Teste todas as funcionalidades da IA Secretária em ambiente simulado
           </p>
 
           <Card className="mb-8 shadow-card">
@@ -42,13 +42,17 @@ const Demo = () => {
                 Nossa clínica de demonstração está totalmente funcional e permite que você teste:
               </p>
               <ul className="space-y-3">
-                <li className="flex items-start gap-3">
+                              <li className="flex items-start gap-3">
+                                  <PhoneCall className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                        <span><strong>Integração WhatsApp:</strong> Responde automaticamente as mensagens dos pacientes</span>
+                    </li>
+                    <li className="flex items-start gap-3">
                   <Calendar className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
-                  <span><strong>Agendamento Automático:</strong> Marque consultas através do WhatsApp e veja aparecer no sistema em tempo real</span>
+                  <span><strong>Agendamento de consultas:</strong> Marque consultas através do WhatsApp e veja aparecer no sistema em tempo real</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Users className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
-                  <span><strong>Gestão de Pacientes:</strong> Cadastro automático de novos pacientes e histórico completo</span>
+                  <span><strong>Gestão de Pacientes:</strong> Cadastro de novos pacientes atendidos pelo WhatsApp</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Bell className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
@@ -146,12 +150,10 @@ const Demo = () => {
                 <div>
                   <h4 className="font-semibold mb-2">👨‍⚕️ Médicos Disponíveis</h4>
                   <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Dr. André Moreira (Clínica Médica)</li>
-                    <li>• Dra. Carolina Santos (Pediatria)</li>
-                    <li>• Dr. Ricardo Lima (Clínica Médica)</li>
-                    <li>• Dra. Juliana Oliveira (Pediatria)</li>
-                    <li>• Dr. Fernando Silva (Clínica Médica)</li>
-                    <li>• Dra. Mariana Rodrigues (Pediatria)</li>
+                    <li>• Dr. André Flores (Clínico Médica)</li>
+                    <li>• Dr. Ricardo Margarida (Clínica Médica)</li>
+                    <li>• Dra. Carolina Violeta (Pediatria)</li>
+                    <li>• Dra. Juliana Rosa (Pediatria)</li>
                   </ul>
                 </div>
 
@@ -163,31 +165,29 @@ const Demo = () => {
                 <div>
                   <h4 className="font-semibold mb-2">📍 Localização</h4>
                   <p className="text-sm text-muted-foreground">
-                    Rua das Flores, 456<br />
-                    Centro - São Paulo/SP<br />
-                    CEP: 01234-567
+                    Rua das Flores, 654<br />
+                    Centro - Florianópolis/SC<br />
                   </p>
                 </div>
 
                 <div>
                   <h4 className="font-semibold mb-2">📞 Contatos</h4>
                   <p className="text-sm text-muted-foreground">
-                    Tel: (11) 3456-7890<br />
-                    WhatsApp: (11) 99988-7766
+                    WhatsApp: (48) 99905-7812
                   </p>
                 </div>
 
-                <div>
-                  <h4 className="font-semibold mb-2">✉️ E-mail</h4>
-                  <p className="text-sm text-muted-foreground">
-                    contato@clinicagirassol.com.br
-                  </p>
-                </div>
               </div>
 
               <div className="bg-muted/50 p-4 rounded-lg mt-6">
                 <p className="text-sm text-muted-foreground">
-                  <strong>💡 Dica:</strong> Ao conversar com a IA no WhatsApp, você pode solicitar agendamentos mencionando qualquer um dos médicos ou especialidades listadas acima. Teste diferentes cenários!
+                    <strong>💡 Dica:</strong> Ao conversar com a IA no WhatsApp, você pode solicitar agendamento de consultas para qualquer um dos médicos ou especialidades listadas acima.
+                </p>
+                <p className="text-sm text-muted-foreground">
+                    Converse com a Rosa e tire dúvidas sobre convênios aceitos, especialidades, exames, etc.
+                </p>
+                <p className="text-sm text-muted-foreground">
+                    Teste diferentes cenários!
                 </p>
               </div>
             </CardContent>
@@ -245,5 +245,4 @@ const Demo = () => {
     </div>
   );
 };
-
 export default Demo;

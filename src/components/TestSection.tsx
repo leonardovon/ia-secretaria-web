@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { MessageSquare, Hospital, LogIn } from 'lucide-react';
+import { MessageSquare, Hospital, LogIn, Check, Smile } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const TestSection = () => {
@@ -39,11 +39,11 @@ const TestSection = () => {
               <div className="flex items-center justify-center gap-2 mb-4">
                 <Hospital className="w-6 h-6 text-primary" />
                 <h3 className="text-xl font-semibold text-foreground">
-                  Clínica Girassol
+                  Acesse a Demonstração
                 </h3>
               </div>
               <p className="text-muted-foreground mb-6">
-                Acesse a área administrativa da clínica demo
+                Site da nossa Clínica Girassol - ambiente fictício para testes
               </p>
               <Button 
                 onClick={handleClinicAccess}
@@ -51,48 +51,34 @@ const TestSection = () => {
               >
                 <LogIn className="w-5 h-5" />
                 Acessar Sistema
-              </Button>
-              <p className="text-sm text-muted-foreground mt-4">
-                Usuário: <strong>von</strong> | Senha: <strong>von123</strong>
-              </p>
+                </Button>
+                <p className="text-sm text-muted-foreground mt-4">
+                    Usuário: <strong>teste</strong> | Senha: <strong>123teste</strong>
+                </p>
+                <p className="text-sm text-muted-foreground mt-4">
+                    * Ambiente de demonstração completo
+                </p>
+              
             </CardContent>
           </Card>
-
           <Card className="shadow-card hover-lift bg-card">
             <CardContent className="p-8 text-center">
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <MessageSquare className="w-6 h-6 text-primary" />
-                <h3 className="text-xl font-semibold text-foreground">
-                  Teste via WhatsApp
-                </h3>
-              </div>
-              <p className="text-muted-foreground mb-6">
-                Converse com o agente inteligente da clínica
-              </p>
-              <Button 
-                onClick={handleWhatsAppTest}
-                className="whatsapp-button text-white px-6 py-3 rounded-full font-semibold inline-flex items-center gap-2 transition-all duration-300 w-full"
-              >
-                <MessageSquare className="w-5 h-5" />
-                Testar no WhatsApp
-              </Button>
-              <p className="text-sm text-muted-foreground mt-4">
-                * Ambiente de demonstração completo
-              </p>
+                <div className="flex items-center justify-center gap-2 mb-4">
+                    <Smile className="w-6 h-6 text-primary" />
+                    <h3 className="text-xl font-semibold text-foreground">
+                        Pronto para Implementar?
+                    </h3>
+                </div>
+                <p className="text-muted-foreground mb-6">
+                            Fale conosco e receba em primeira mão todos os detalhes dos nossos planos e serviços.
+                </p>
+                <Button onClick={handleDemoRequest}
+                        className="bg-gradient-primary hover:opacity-90 text-primary-foreground px-6 py-3 rounded-full font-semibold inline-flex items-center gap-2 transition-all duration-300 w-full">
+                    Eu Quero!
+                </Button>
+                
             </CardContent>
           </Card>
-        </div>
-
-        <div className="text-center">
-          <h3 className="text-2xl font-semibold mb-4 text-foreground">
-            Pronto para Implementar?
-          </h3>
-          <Button 
-            onClick={handleDemoRequest}
-            className="bg-gradient-primary hover:opacity-90 text-primary-foreground px-8 py-4 text-lg font-semibold rounded-full shadow-elegant hover-lift transition-all duration-300"
-          >
-            Solicitar Demonstração Personalizada
-          </Button>
         </div>
       </div>
     </section>

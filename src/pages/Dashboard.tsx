@@ -2,7 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, MessageSquare, Users, Calendar, Settings } from 'lucide-react';
+import { LogOut, MessageSquare, Users, Calendar, Settings, Smile } from 'lucide-react';
 
 export default function Dashboard() {
   const { logout } = useAuth();
@@ -13,8 +13,9 @@ export default function Dashboard() {
     navigate('/login');
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
+    return (
+      //Colocar Dados da Clinica Girassol primeiro.
+      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
       <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-primary">Sistema de Gestão</h1>
@@ -29,11 +30,11 @@ export default function Dashboard() {
         <div className="mb-8">
           <h2 className="text-3xl font-bold mb-2">Dashboard</h2>
           <p className="text-muted-foreground">
-            Bem-vindo ao painel de controle da clínica
+                      Bem-vindo ao painel de controle da clínica <strong>Girassol</strong>🌻
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
           <Card className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader>
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">

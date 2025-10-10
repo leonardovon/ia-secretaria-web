@@ -69,7 +69,7 @@ export default function Login() {
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="space-y-4 text-center">
           <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-            <Stethoscope className="w-8 h-8 text-primary" />
+            <Stethoscope  className="w-8 h-8 text-primary" />
           </div>
           <div>
             <CardTitle className="text-3xl">Sistema de Gestão</CardTitle>
