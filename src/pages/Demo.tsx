@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MessageSquare, ArrowLeft, Calendar, Users, Bell, Settings } from 'lucide-react';
+import { MessageSquare, ArrowLeft, Calendar, Users, Bell, Settings, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Demo = () => {
@@ -43,7 +43,7 @@ const Demo = () => {
               </p>
               <ul className="space-y-3">
                               <li className="flex items-start gap-3">
-                                  <PhoneCall className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                                  <Phone className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
                         <span><strong>Integração WhatsApp:</strong> Responde automaticamente as mensagens dos pacientes</span>
                     </li>
                     <li className="flex items-start gap-3">

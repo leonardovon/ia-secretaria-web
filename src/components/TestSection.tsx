@@ -64,7 +64,7 @@ const TestSection = () => {
           <Card className="shadow-card hover-lift bg-card">
             <CardContent className="p-8 text-center">
                 <div className="flex items-center justify-center gap-2 mb-4">
-                    <Smile className="w-6 h-6 text-primary" />
+                    <Smile className="w-6 h-6 text-primary" /> 
                     <h3 className="text-xl font-semibold text-foreground">
                         Pronto para Implementar?
                     </h3>
