@@ -109,21 +109,27 @@ export default function SignUp() {
         return;
       }
 
-      // TODO: Implementar envio de email de boas-vindas após deploy
-      // const loginUrl = `${window.location.origin}/login`;
-      // await supabase.functions.invoke('send-welcome-email', {
-      //   body: {
-      //     name: validatedData.nome_clinica,
-      //     email: validatedData.email,
-      //     login: validatedData.login,
-      //     password: validatedData.senha,
-      //     loginUrl: loginUrl
-      //   }
-      // });
+      // 3. Enviar email de boas-vindas
+      const loginUrl = `${window.location.origin}/login`;
+      
+      const emailResult = await supabase.functions.invoke('send-welcome-email', {
+        body: {
+          name: validatedData.nome_clinica,
+          email: validatedData.email,
+          login: validatedData.login,
+          password: validatedData.senha,
+          loginUrl: loginUrl
+        }
+      });
+
+      if (emailResult.error) {
+        console.error('Erro ao enviar email:', emailResult.error);
+        // Não bloqueia o cadastro se o email falhar
+      }
 
       toast({
         title: 'Conta criada com sucesso!',
-        description: 'Você já pode fazer login no sistema.',
+        description: 'Verifique seu email para as credenciais de acesso.',
       });
       
       navigate('/login');
