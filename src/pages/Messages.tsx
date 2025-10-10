@@ -121,7 +121,7 @@ export default function Messages() {
               </Avatar>
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-baseline">
-                  <h3 className="font-medium text-foreground truncate">
+                  <h3 className="font-semibold text-foreground truncate">
                     {chat.patient_name || chat.nomewpp}
                   </h3>
                   <span className="text-xs text-muted-foreground">
@@ -131,8 +131,8 @@ export default function Messages() {
                     })}
                   </span>
                 </div>
-                <p className="text-sm text-muted-foreground text-xs truncate">{chat.phone}</p>
-                <p className="text-sm text-muted-foreground truncate">{chat.last_message}</p>
+                <p className="text-sm text-muted-foreground truncate">{chat.phone}</p>
+                <p className="text-sm text-muted-foreground truncate mt-1">{chat.last_message}</p>
               </div>
             </div>
           ))}
