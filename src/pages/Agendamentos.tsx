@@ -58,7 +58,7 @@ interface Doctor {
 }
 
 export default function Agendamentos() {
-  const { logout } = useAuth();
+  const { logout, clinicId } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
@@ -74,43 +74,65 @@ export default function Agendamentos() {
     status: 'agendado',
   });
 
-  const { data: appointments = [], isLoading } = useQuery({
-    queryKey: ['appointments'],
+  const { data: appointments = [], isLoading } = useQuery<Appointment[]>({
+    queryKey: ['appointments', clinicId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      if (!clinicId) return [];
+      
+      // Buscar pacientes da clínica primeiro
+      const pacienteQuery: any = await supabase
+        .from('pacientes')
+        .select('id')
+        .eq('clinic_id', clinicId);
+      
+      if (!pacienteQuery.data || pacienteQuery.data.length === 0) return [];
+      
+      const pacienteIds = pacienteQuery.data.map((p: any) => p.id);
+      
+      const agendamentosQuery: any = await supabase
         .from('agendamentos')
         .select('*')
+        .in('paciente_id', pacienteIds)
         .order('data_agendamento', { ascending: true });
       
-      if (error) throw error;
-      return data as Appointment[];
+      if (agendamentosQuery.error) throw agendamentosQuery.error;
+      return (agendamentosQuery.data || []) as Appointment[];
     },
+    enabled: !!clinicId,
   });
 
-  const { data: patients = [] } = useQuery({
-    queryKey: ['patients'],
+  const { data: patients = [] } = useQuery<Patient[]>({
+    queryKey: ['patients', clinicId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      if (!clinicId) return [];
+      
+      const patientQuery: any = await supabase
         .from('pacientes')
         .select('id, nome')
+        .eq('clinic_id', clinicId)
         .order('nome');
       
-      if (error) throw error;
-      return data as Patient[];
+      if (patientQuery.error) throw patientQuery.error;
+      return (patientQuery.data || []) as Patient[];
     },
+    enabled: !!clinicId,
   });
 
-  const { data: doctors = [] } = useQuery({
-    queryKey: ['doctors'],
+  const { data: doctors = [] } = useQuery<Doctor[]>({
+    queryKey: ['doctors', clinicId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      if (!clinicId) return [];
+      
+      const doctorQuery: any = await supabase
         .from('medicos')
         .select('id, nome')
+        .eq('clinic_id', clinicId)
         .order('nome');
       
-      if (error) throw error;
-      return data as Doctor[];
+      if (doctorQuery.error) throw doctorQuery.error;
+      return (doctorQuery.data || []) as Doctor[];
     },
+    enabled: !!clinicId,
   });
 
   const createMutation = useMutation({
@@ -125,7 +147,7 @@ export default function Agendamentos() {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['appointments', clinicId] });
       toast.success('Agendamento criado com sucesso!');
       setIsDialogOpen(false);
       resetForm();
@@ -148,7 +170,7 @@ export default function Agendamentos() {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['appointments', clinicId] });
       toast.success('Agendamento atualizado com sucesso!');
       setIsDialogOpen(false);
       resetForm();
@@ -168,7 +190,7 @@ export default function Agendamentos() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['appointments', clinicId] });
       toast.success('Agendamento excluído com sucesso!');
     },
     onError: (error) => {
