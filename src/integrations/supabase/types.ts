@@ -321,6 +321,29 @@ export type Database = {
         Args: { "": string } | { "": unknown }
         Returns: unknown
       }
+      create_agendamento: {
+        Args: {
+          p_clinic_id: string
+          p_data_agendamento: string
+          p_informacoes_adicionais: string
+          p_medico_id: string
+          p_paciente_id: string
+          p_procedimento: string
+          p_status: string
+        }
+        Returns: {
+          clinic_id: string
+          created_at: string
+          data_agendamento: string
+          id: string
+          informacoes_adicionais: string
+          medico_id: string
+          paciente_id: string
+          procedimento: string
+          status: string
+          updated_at: string
+        }[]
+      }
       create_user_account: {
         Args:
           | {
@@ -340,9 +363,42 @@ export type Database = {
             }
         Returns: string
       }
+      delete_agendamento: {
+        Args: { p_agendamento_id: string }
+        Returns: boolean
+      }
       delete_user_account: {
         Args: { p_account_id: string }
         Returns: boolean
+      }
+      get_clinic_agendamentos: {
+        Args: { p_clinic_id: string }
+        Returns: {
+          clinic_id: string
+          created_at: string
+          data_agendamento: string
+          id: string
+          informacoes_adicionais: string
+          medico_id: string
+          paciente_id: string
+          procedimento: string
+          status: string
+          updated_at: string
+        }[]
+      }
+      get_clinic_medicos: {
+        Args: { p_clinic_id: string }
+        Returns: {
+          id: string
+          nome: string
+        }[]
+      }
+      get_clinic_pacientes: {
+        Args: { p_clinic_id: string }
+        Returns: {
+          id: string
+          nome: string
+        }[]
       }
       get_clinica_chats: {
         Args: Record<PropertyKey, never>
@@ -526,6 +582,29 @@ export type Database = {
       unaccent_init: {
         Args: { "": unknown }
         Returns: unknown
+      }
+      update_agendamento: {
+        Args: {
+          p_agendamento_id: string
+          p_data_agendamento: string
+          p_informacoes_adicionais: string
+          p_medico_id: string
+          p_paciente_id: string
+          p_procedimento: string
+          p_status: string
+        }
+        Returns: {
+          clinic_id: string
+          created_at: string
+          data_agendamento: string
+          id: string
+          informacoes_adicionais: string
+          medico_id: string
+          paciente_id: string
+          procedimento: string
+          status: string
+          updated_at: string
+        }[]
       }
       update_clinica_config: {
         Args: {

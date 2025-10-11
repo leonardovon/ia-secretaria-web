@@ -79,14 +79,12 @@ export default function Agendamentos() {
     queryFn: async () => {
       if (!clinicId) return [];
       
-      const { data, error } = await supabase
-        .from('clinica.agendamentos')
-        .select('*')
-        .eq('clinic_id', clinicId)
-        .order('data_agendamento', { ascending: true });
+      const { data, error } = await (supabase as any).rpc('get_clinic_agendamentos', {
+        p_clinic_id: clinicId,
+      } as any);
       
       if (error) throw error;
-      return (data || []) as Appointment[];
+      return ((data || []) as unknown) as Appointment[];
     },
     enabled: !!clinicId,
   });
@@ -96,14 +94,12 @@ export default function Agendamentos() {
     queryFn: async () => {
       if (!clinicId) return [];
       
-      const { data, error } = await supabase
-        .from('clinica.pacientes')
-        .select('id, nome')
-        .eq('clinic_id', clinicId)
-        .order('nome');
+      const { data, error } = await (supabase as any).rpc('get_clinic_pacientes', {
+        p_clinic_id: clinicId,
+      } as any);
       
       if (error) throw error;
-      return (data || []) as Patient[];
+      return ((data || []) as unknown) as Patient[];
     },
     enabled: !!clinicId,
   });
@@ -113,28 +109,30 @@ export default function Agendamentos() {
     queryFn: async () => {
       if (!clinicId) return [];
       
-      const { data, error } = await supabase
-        .from('clinica.medicos')
-        .select('id, nome')
-        .eq('clinic_id', clinicId)
-        .order('nome');
+      const { data, error } = await (supabase as any).rpc('get_clinic_medicos', {
+        p_clinic_id: clinicId,
+      } as any);
       
       if (error) throw error;
-      return (data || []) as Doctor[];
+      return ((data || []) as unknown) as Doctor[];
     },
     enabled: !!clinicId,
   });
 
   const createMutation = useMutation({
     mutationFn: async (newAppointment: Omit<Appointment, 'id' | 'created_at'>) => {
-      const { data, error } = await supabase
-        .from('clinica.agendamentos')
-        .insert([{ ...newAppointment, clinic_id: clinicId }])
-        .select()
-        .single();
+      const { data, error } = await (supabase as any).rpc('create_agendamento', {
+        p_clinic_id: clinicId,
+        p_paciente_id: newAppointment.paciente_id,
+        p_medico_id: newAppointment.medico_id,
+        p_data_agendamento: newAppointment.data_agendamento,
+        p_procedimento: newAppointment.procedimento,
+        p_informacoes_adicionais: newAppointment.informacoes_adicionais,
+        p_status: newAppointment.status,
+      } as any);
       
       if (error) throw error;
-      return data;
+      return data as any;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments', clinicId] });
@@ -149,16 +147,18 @@ export default function Agendamentos() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Appointment> & { id: string }) => {
-      const { data, error } = await supabase
-        .from('clinica.agendamentos')
-        .update(updates)
-        .eq('id', id)
-        .eq('clinic_id', clinicId)
-        .select()
-        .single();
+      const { data, error } = await (supabase as any).rpc('update_agendamento', {
+        p_agendamento_id: id,
+        p_paciente_id: updates.paciente_id,
+        p_medico_id: updates.medico_id,
+        p_data_agendamento: updates.data_agendamento,
+        p_procedimento: updates.procedimento,
+        p_informacoes_adicionais: updates.informacoes_adicionais,
+        p_status: updates.status,
+      } as any);
       
       if (error) throw error;
-      return data;
+      return data as any;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments', clinicId] });
@@ -173,11 +173,9 @@ export default function Agendamentos() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('clinica.agendamentos')
-        .delete()
-        .eq('id', id)
-        .eq('clinic_id', clinicId);
+      const { error } = await (supabase as any).rpc('delete_agendamento', {
+        p_agendamento_id: id,
+      } as any);
       
       if (error) throw error;
     },
