@@ -14,7 +14,7 @@ export function createSupabaseClient() {
 
 export async function validateClinicExists(supabase: any, clinicId: string): Promise<boolean> {
   const { data, error } = await supabase
-    .from('config')
+    .from('clinica.config')
     .select('id')
     .eq('id', clinicId)
     .single();
