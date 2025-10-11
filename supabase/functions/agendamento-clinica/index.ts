@@ -250,54 +250,83 @@ async function consultarAgendamentos(supabase: any, body: AgendamentoRequest): P
   const { clinic_id, filtros } = body;
 
   try {
-    let query = supabase
+    // 1) Buscar IDs de pacientes da clínica
+    const { data: pacientesRows, error: pacientesError } = await supabase
       .schema('clinica')
-      .from('agendamentos')
-      .select(`
-        id,
-        procedimento,
-        data_agendamento,
-        status,
-        informacoes_adicionais,
-        created_at,
-        pacientes!inner (id, nome, telefone, clinic_id),
-        medicos (id, nome)
-      `)
-      .eq('pacientes.clinic_id', clinic_id)
-      .order('data_agendamento', { ascending: true });
+      .from('pacientes')
+      .select('id')
+      .eq('clinic_id', clinic_id);
 
-    if (filtros?.data_inicio) {
-      query = query.gte('data_agendamento', filtros.data_inicio);
-    }
-
-    if (filtros?.data_fim) {
-      query = query.lte('data_agendamento', filtros.data_fim);
-    }
-
-    if (filtros?.medico_id) {
-      query = query.eq('medico_id', filtros.medico_id);
-    }
-
-    if (filtros?.paciente_id) {
-      query = query.eq('paciente_id', filtros.paciente_id);
-    }
-
-    if (filtros?.status) {
-      query = query.eq('status', filtros.status);
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
-      console.error('Erro ao consultar agendamentos:', error);
+    if (pacientesError) {
+      console.error('Erro ao listar pacientes da clínica:', pacientesError);
       return { success: false, error: 'Erro ao consultar agendamentos' };
     }
 
-    return {
-      success: true,
-      message: `${data.length} agendamento(s) encontrado(s)`,
-      data
-    };
+    const pacienteIds = (pacientesRows ?? []).map((p: any) => p.id);
+
+    // Se não há pacientes, retorna vazio
+    if (!pacienteIds.length) {
+      return { success: true, message: '0 agendamento(s) encontrado(s)', data: [] };
+    }
+
+    // 2) Se filtro de paciente_id existir, valida se pertence à clínica
+    if (filtros?.paciente_id && !pacienteIds.includes(filtros.paciente_id)) {
+      return { success: true, message: '0 agendamento(s) encontrado(s)', data: [] };
+    }
+
+    // 3) Montar consulta de agendamentos filtrando por paciente_id
+    let query = supabase
+      .schema('clinica')
+      .from('agendamentos')
+      .select('id, procedimento, data_agendamento, status, informacoes_adicionais, created_at, paciente_id, medico_id')
+      .in('paciente_id', filtros?.paciente_id ? [filtros.paciente_id] : pacienteIds)
+      .order('data_agendamento', { ascending: true });
+
+    if (filtros?.data_inicio) query = query.gte('data_agendamento', filtros.data_inicio);
+    if (filtros?.data_fim) query = query.lte('data_agendamento', filtros.data_fim);
+    if (filtros?.medico_id) query = query.eq('medico_id', filtros.medico_id);
+    if (filtros?.status) query = query.eq('status', filtros.status);
+
+    const { data: agendamentos, error: agError } = await query;
+
+    if (agError) {
+      console.error('Erro ao consultar agendamentos:', agError);
+      return { success: false, error: 'Erro ao consultar agendamentos' };
+    }
+
+    if (!agendamentos?.length) {
+      return { success: true, message: '0 agendamento(s) encontrado(s)', data: [] };
+    }
+
+    // 4) Enriquecer com dados de paciente e médico (opcional)
+    const uniqPacienteIds = [...new Set(agendamentos.map((a: any) => a.paciente_id))];
+    const uniqMedicoIds = [...new Set(agendamentos.map((a: any) => a.medico_id).filter(Boolean))];
+
+    const [pacRes, medRes] = await Promise.all([
+      supabase.schema('clinica').from('pacientes').select('id, nome, telefone').in('id', uniqPacienteIds),
+      uniqMedicoIds.length
+        ? supabase.schema('clinica').from('medicos').select('id, nome').in('id', uniqMedicoIds)
+        : Promise.resolve({ data: [] as any[], error: null } as any)
+    ]);
+
+    const pacientesDetalhe = (pacRes as any).data ?? [];
+    const medicosDetalhe = (medRes as any).data ?? [];
+
+    const pacMap = new Map((pacientesDetalhe ?? []).map((p: any) => [p.id, p]));
+    const medMap = new Map((medicosDetalhe ?? []).map((m: any) => [m.id, m]));
+
+    const resultado = agendamentos.map((a: any) => ({
+      id: a.id,
+      procedimento: a.procedimento,
+      data_agendamento: a.data_agendamento,
+      status: a.status,
+      informacoes_adicionais: a.informacoes_adicionais,
+      created_at: a.created_at,
+      pacientes: pacMap.get(a.paciente_id) || null,
+      medicos: a.medico_id ? medMap.get(a.medico_id) || null : null,
+    }));
+
+    return { success: true, message: `${resultado.length} agendamento(s) encontrado(s)`, data: resultado };
 
   } catch (error: any) {
     console.error('Erro em consultarAgendamentos:', error);
