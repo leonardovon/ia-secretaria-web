@@ -124,6 +124,7 @@ async function criarAgendamento(supabase: any, body: AgendamentoRequest): Promis
     let pacienteId: string;
     
     const { data: pacienteExistente, error: searchError } = await supabase
+      .schema('clinica')
       .from('pacientes')
       .select('id')
       .eq('clinic_id', clinic_id)
@@ -140,6 +141,7 @@ async function criarAgendamento(supabase: any, body: AgendamentoRequest): Promis
       console.log('Paciente encontrado:', pacienteId);
     } else {
       const { data: novoPaciente, error: insertError } = await supabase
+        .schema('clinica')
         .from('pacientes')
         .insert({
           clinic_id,
@@ -164,6 +166,7 @@ async function criarAgendamento(supabase: any, body: AgendamentoRequest): Promis
 
     if (!medicoId && agendamento.medico_nome) {
       const { data: medicoExistente, error: searchMedicoError } = await supabase
+        .schema('clinica')
         .from('medicos')
         .select('id')
         .eq('clinic_id', clinic_id)
@@ -178,6 +181,7 @@ async function criarAgendamento(supabase: any, body: AgendamentoRequest): Promis
         medicoId = medicoExistente.id;
       } else {
         const { data: novoMedico, error: insertMedicoError } = await supabase
+          .schema('clinica')
           .from('medicos')
           .insert({
             clinic_id,
@@ -196,7 +200,6 @@ async function criarAgendamento(supabase: any, body: AgendamentoRequest): Promis
 
     // 3. Criar agendamento
     const agendamentoData: any = {
-      clinic_id,
       paciente_id: pacienteId,
       procedimento: agendamento.procedimento,
       data_agendamento: agendamento.data_agendamento,
@@ -212,6 +215,7 @@ async function criarAgendamento(supabase: any, body: AgendamentoRequest): Promis
     }
 
     const { data: novoAgendamento, error: agendError } = await supabase
+      .schema('clinica')
       .from('agendamentos')
       .insert(agendamentoData)
       .select(`
@@ -247,6 +251,7 @@ async function consultarAgendamentos(supabase: any, body: AgendamentoRequest): P
 
   try {
     let query = supabase
+      .schema('clinica')
       .from('agendamentos')
       .select(`
         id,
@@ -255,10 +260,10 @@ async function consultarAgendamentos(supabase: any, body: AgendamentoRequest): P
         status,
         informacoes_adicionais,
         created_at,
-        pacientes (id, nome, telefone),
+        pacientes!inner (id, nome, telefone, clinic_id),
         medicos (id, nome)
       `)
-      .eq('clinic_id', clinic_id)
+      .eq('pacientes.clinic_id', clinic_id)
       .order('data_agendamento', { ascending: true });
 
     if (filtros?.data_inicio) {
@@ -316,6 +321,19 @@ async function remarcarAgendamento(supabase: any, body: AgendamentoRequest): Pro
   }
 
   try {
+    // Verificar se o agendamento pertence à clínica
+    const { data: agendCheck } = await supabase
+      .schema('clinica')
+      .from('agendamentos')
+      .select('id, pacientes!inner(clinic_id)')
+      .eq('id', agendamento.id)
+      .eq('pacientes.clinic_id', clinic_id)
+      .maybeSingle();
+    
+    if (!agendCheck) {
+      return { success: false, error: 'Agendamento não encontrado ou não pertence a esta clínica' };
+    }
+
     const updateData: any = {
       data_agendamento: agendamento.data_agendamento,
       status: 'remarcado'
@@ -326,10 +344,10 @@ async function remarcarAgendamento(supabase: any, body: AgendamentoRequest): Pro
     }
 
     const { data, error } = await supabase
+      .schema('clinica')
       .from('agendamentos')
       .update(updateData)
       .eq('id', agendamento.id)
-      .eq('clinic_id', clinic_id)
       .select(`
         id,
         procedimento,
@@ -373,11 +391,24 @@ async function cancelarAgendamento(supabase: any, body: AgendamentoRequest): Pro
   }
 
   try {
+    // Verificar se o agendamento pertence à clínica
+    const { data: agendCheck } = await supabase
+      .schema('clinica')
+      .from('agendamentos')
+      .select('id, pacientes!inner(clinic_id)')
+      .eq('id', agendamento.id)
+      .eq('pacientes.clinic_id', clinic_id)
+      .maybeSingle();
+    
+    if (!agendCheck) {
+      return { success: false, error: 'Agendamento não encontrado ou não pertence a esta clínica' };
+    }
+
     const { data, error } = await supabase
+      .schema('clinica')
       .from('agendamentos')
       .update({ status: 'cancelado' })
       .eq('id', agendamento.id)
-      .eq('clinic_id', clinic_id)
       .select(`
         id,
         procedimento,
