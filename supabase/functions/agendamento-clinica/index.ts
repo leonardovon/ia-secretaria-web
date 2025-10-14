@@ -215,6 +215,7 @@ async function criarAgendamento(supabase: any, body: AgendamentoRequest): Promis
 
     // 3. Criar agendamento
     const agendamentoData: any = {
+      clinic_id,
       paciente_id: pacienteId,
       procedimento: agendamento.procedimento,
       data_agendamento: agendamento.data_agendamento,
