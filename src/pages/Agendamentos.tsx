@@ -296,12 +296,20 @@ export default function Agendamentos() {
   const getAppointmentForSlot = (day: Date, hour: number, minute: number) => {
     return appointments.find(appointment => {
       const appointmentDate = new Date(appointment.data_agendamento);
+      
+      // Compara usando UTC para evitar problemas de fuso horário
+      const appointmentYear = appointmentDate.getUTCFullYear();
+      const appointmentMonth = appointmentDate.getUTCMonth();
+      const appointmentDay = appointmentDate.getUTCDate();
+      const appointmentHour = appointmentDate.getUTCHours();
+      const appointmentMinute = appointmentDate.getUTCMinutes();
+      
       return (
-        appointmentDate.getFullYear() === day.getFullYear() &&
-        appointmentDate.getMonth() === day.getMonth() &&
-        appointmentDate.getDate() === day.getDate() &&
-        appointmentDate.getHours() === hour &&
-        appointmentDate.getMinutes() === minute
+        appointmentYear === day.getFullYear() &&
+        appointmentMonth === day.getMonth() &&
+        appointmentDay === day.getDate() &&
+        appointmentHour === hour &&
+        appointmentMinute === minute
       );
     });
   };
