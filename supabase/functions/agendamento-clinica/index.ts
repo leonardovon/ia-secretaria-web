@@ -504,8 +504,7 @@ async function buscarHorariosDisponiveis(supabase: any, body: AgendamentoRequest
 
     // 1) Definir horários de funcionamento
     const HORARIOS_FUNCIONAMENTO = {
-      segunda_sexta: { inicio: 8, fim: 18 }, // 08h - 18h
-      sabado: { inicio: 8, fim: 12 },       // 08h - 12h
+      segunda_sexta: { inicio: 7, fim: 19 }, // 07h - 19h
     } as const;
     const DURACAO_CONSULTA = 30; // minutos
 
@@ -557,22 +556,16 @@ async function buscarHorariosDisponiveis(supabase: any, body: AgendamentoRequest
     while (horariosDisponiveis.length < limite && dataAtual < fimIntervalo) {
       const diaSemana = dataAtual.getDay();
 
-      // Pular domingos (0)
-      if (diaSemana === 0) {
+      // Pular finais de semana (sábado=6, domingo=0)
+      if (diaSemana === 0 || diaSemana === 6) {
         dataAtual.setDate(dataAtual.getDate() + 1);
         dataAtual.setHours(0, 0, 0, 0);
         continue;
       }
 
-      // Determinar horário de funcionamento
-      let horaInicio: number, horaFim: number;
-      if (diaSemana === 6) { // Sábado
-        horaInicio = HORARIOS_FUNCIONAMENTO.sabado.inicio;
-        horaFim = HORARIOS_FUNCIONAMENTO.sabado.fim;
-      } else { // Segunda a Sexta
-        horaInicio = HORARIOS_FUNCIONAMENTO.segunda_sexta.inicio;
-        horaFim = HORARIOS_FUNCIONAMENTO.segunda_sexta.fim;
-      }
+      // Horário de funcionamento segunda a sexta
+      const horaInicio = HORARIOS_FUNCIONAMENTO.segunda_sexta.inicio;
+      const horaFim = HORARIOS_FUNCIONAMENTO.segunda_sexta.fim;
 
       // Se é o primeiro dia, começar a partir do horário sugerido (ajustado)
       if (dataAtual.toDateString() === dataSugerida.toDateString()) {
