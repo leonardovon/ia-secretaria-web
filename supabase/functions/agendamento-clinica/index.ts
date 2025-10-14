@@ -478,33 +478,62 @@ async function buscarHorariosDisponiveis(supabase: any, body: AgendamentoRequest
   if (!filtros?.medico_id || !filtros.data_inicio) {
     return {
       success: false,
-      error: 'medico_id e data_sugerida são obrigatórios'
+      error: 'medico_id e data_inicio são obrigatórios'
     };
   }
 
   const limite = filtros.limite || 3;
 
   try {
-    // Definir horários de funcionamento
-    const HORARIOS_FUNCIONAMENTO = {
-      segunda_sexta: { inicio: 8, fim: 18 },
-      sabado: { inicio: 8, fim: 12 }
-    };
-    const DURACAO_CONSULTA = 30; // minutos
+    // 0) Verificar se o médico pertence à clínica
+    const { data: medicoRow, error: medicoErr } = await supabase
+      .schema('clinica')
+      .from('medicos')
+      .select('id')
+      .eq('id', filtros.medico_id)
+      .eq('clinic_id', clinic_id)
+      .maybeSingle();
 
-    // Parse da data sugerida
-    const dataSugerida = new Date(filtros.data_inicio);
-    if (isNaN(dataSugerida.getTime())) {
-      return { success: false, error: 'data_sugerida inválida. Use formato ISO 8601' };
+    if (medicoErr) {
+      console.error('Erro ao validar médico:', medicoErr);
+      return { success: false, error: 'Erro ao validar médico' };
+    }
+    if (!medicoRow) {
+      return { success: false, error: 'Médico não encontrado para esta clínica' };
     }
 
-    // Buscar agendamentos do médico
+    // 1) Definir horários de funcionamento
+    const HORARIOS_FUNCIONAMENTO = {
+      segunda_sexta: { inicio: 8, fim: 18 }, // 08h - 18h
+      sabado: { inicio: 8, fim: 12 },       // 08h - 12h
+    } as const;
+    const DURACAO_CONSULTA = 30; // minutos
+
+    // 2) Parse da data sugerida
+    const dataSugerida = new Date(filtros.data_inicio);
+    if (isNaN(dataSugerida.getTime())) {
+      return { success: false, error: 'data_inicio inválida. Use formato ISO 8601' };
+    }
+
+    // Nunca retornar horários no passado
+    const agora = new Date();
+    if (dataSugerida < agora) {
+      // arredonda para o próximo slot de 30 minutos
+      const arred = new Date(agora);
+      const min = arred.getMinutes();
+      arred.setSeconds(0, 0);
+      if (min > 0 && min <= 30) arred.setMinutes(30);
+      else if (min > 30) arred.setHours(arred.getHours() + 1, 0, 0, 0);
+      dataSugerida.setTime(arred.getTime());
+    }
+
+    // 3) Intervalo de busca (até 14 dias à frente)
     const inicioIntervalo = new Date(dataSugerida);
     inicioIntervalo.setHours(0, 0, 0, 0);
-    
     const fimIntervalo = new Date(inicioIntervalo);
-    fimIntervalo.setDate(fimIntervalo.getDate() + 14); // Buscar até 2 semanas à frente
+    fimIntervalo.setDate(fimIntervalo.getDate() + 14);
 
+    // 4) Buscar agendamentos já ocupados do médico
     const { data: agendamentos, error: agendError } = await supabase
       .schema('clinica')
       .from('agendamentos')
@@ -519,18 +548,15 @@ async function buscarHorariosDisponiveis(supabase: any, body: AgendamentoRequest
       return { success: false, error: 'Erro ao buscar agendamentos do médico' };
     }
 
-    // Criar set de horários ocupados
-    const horariosOcupados = new Set(
-      (agendamentos || []).map((a: any) => new Date(a.data_agendamento).getTime())
-    );
+    const horariosOcupados = new Set((agendamentos || []).map((a: any) => new Date(a.data_agendamento).getTime()));
 
-    // Gerar horários disponíveis
+    // 5) Gerar horários disponíveis seguindo regras
     const horariosDisponiveis: Array<{ data: string; hora: string }> = [];
     let dataAtual = new Date(dataSugerida);
-    
+
     while (horariosDisponiveis.length < limite && dataAtual < fimIntervalo) {
       const diaSemana = dataAtual.getDay();
-      
+
       // Pular domingos (0)
       if (diaSemana === 0) {
         dataAtual.setDate(dataAtual.getDate() + 1);
@@ -548,18 +574,18 @@ async function buscarHorariosDisponiveis(supabase: any, body: AgendamentoRequest
         horaFim = HORARIOS_FUNCIONAMENTO.segunda_sexta.fim;
       }
 
-      // Se é o primeiro dia, começar do horário sugerido
+      // Se é o primeiro dia, começar a partir do horário sugerido (ajustado)
       if (dataAtual.toDateString() === dataSugerida.toDateString()) {
         const horaSugerida = dataSugerida.getHours();
         const minutoSugerido = dataSugerida.getMinutes();
-        
+
         // Arredondar para próximo slot de 30 minutos
         if (minutoSugerido > 0 && minutoSugerido <= 30) {
           dataAtual.setMinutes(30, 0, 0);
         } else if (minutoSugerido > 30) {
           dataAtual.setHours(horaSugerida + 1, 0, 0, 0);
         }
-        
+
         if (dataAtual.getHours() < horaInicio) {
           dataAtual.setHours(horaInicio, 0, 0, 0);
         }
@@ -568,25 +594,25 @@ async function buscarHorariosDisponiveis(supabase: any, body: AgendamentoRequest
       }
 
       // Verificar slots do dia
-      while (dataAtual.getHours() < horaFim || 
-             (dataAtual.getHours() === horaFim && dataAtual.getMinutes() === 0)) {
-        
+      while (
+        dataAtual.getHours() < horaFim ||
+        (dataAtual.getHours() === horaFim && dataAtual.getMinutes() === 0)
+      ) {
         // Última consulta deve ter tempo suficiente (30 minutos)
         const ultimoHorario = new Date(dataAtual);
         ultimoHorario.setMinutes(ultimoHorario.getMinutes() + DURACAO_CONSULTA);
-        
+
         if (ultimoHorario.getHours() <= horaFim) {
           const timestamp = dataAtual.getTime();
-          
-          if (!horariosOcupados.has(timestamp)) {
+
+          // Não permitir horários no passado
+          if (dataAtual >= agora && !horariosOcupados.has(timestamp)) {
             horariosDisponiveis.push({
               data: dataAtual.toISOString(),
-              hora: `${String(dataAtual.getHours()).padStart(2, '0')}:${String(dataAtual.getMinutes()).padStart(2, '0')}`
+              hora: `${String(dataAtual.getHours()).padStart(2, '0')}:${String(dataAtual.getMinutes()).padStart(2, '0')}`,
             });
 
-            if (horariosDisponiveis.length >= limite) {
-              break;
-            }
+            if (horariosDisponiveis.length >= limite) break;
           }
         }
 
@@ -602,9 +628,8 @@ async function buscarHorariosDisponiveis(supabase: any, body: AgendamentoRequest
     return {
       success: true,
       message: `${horariosDisponiveis.length} horário(s) disponível(is) encontrado(s)`,
-      data: horariosDisponiveis
+      data: horariosDisponiveis,
     };
-
   } catch (error: any) {
     console.error('Erro em buscarHorariosDisponiveis:', error);
     return { success: false, error: formatErrorMessage(error) };
