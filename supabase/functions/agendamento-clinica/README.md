@@ -98,6 +98,47 @@ Authorization: Bearer <seu-token>
 }
 ```
 
+### 5. Buscar Horários Disponíveis
+
+```json
+{
+  "action": "horarios_disponiveis",
+  "clinic_id": "uuid-da-clinica",
+  "filtros": {
+    "medico_id": "uuid-do-medico",
+    "data_inicio": "2025-01-15T10:00:00",
+    "limite": 3
+  }
+}
+```
+
+**Parâmetros:**
+- `medico_id` (obrigatório): UUID do médico
+- `data_inicio` (obrigatório): Data/hora sugerida em formato ISO 8601
+- `limite` (opcional): Quantidade de horários a retornar (padrão: 3)
+
+**Resposta de sucesso:**
+```json
+{
+  "success": true,
+  "message": "3 horário(s) disponível(is) encontrado(s)",
+  "data": [
+    {
+      "data": "2025-01-15T10:00:00.000Z",
+      "hora": "10:00"
+    },
+    {
+      "data": "2025-01-15T10:30:00.000Z",
+      "hora": "10:30"
+    },
+    {
+      "data": "2025-01-15T11:00:00.000Z",
+      "hora": "11:00"
+    }
+  ]
+}
+```
+
 ## Respostas
 
 ### Sucesso

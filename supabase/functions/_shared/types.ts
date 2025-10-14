@@ -1,7 +1,7 @@
 // Tipos compartilhados entre edge functions
 
 export interface AgendamentoRequest {
-  action: 'criar' | 'consultar' | 'remarcar' | 'cancelar';
+  action: 'criar' | 'consultar' | 'remarcar' | 'cancelar' | 'horarios_disponiveis';
   clinic_id?: string;
   paciente?: {
     nome: string;
@@ -22,6 +22,7 @@ export interface AgendamentoRequest {
     medico_id?: string;
     paciente_id?: string;
     status?: string;
+    limite?: number;
   };
 }
 

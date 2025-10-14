@@ -66,10 +66,13 @@ Deno.serve(async (req) => {
       case 'cancelar':
         result = await cancelarAgendamento(supabase, body);
         break;
+      case 'horarios_disponiveis':
+        result = await buscarHorariosDisponiveis(supabase, body);
+        break;
       default:
         result = {
           success: false,
-          error: `Ação '${action}' não reconhecida. Use: criar, consultar, remarcar ou cancelar`
+          error: `Ação '${action}' não reconhecida. Use: criar, consultar, remarcar, cancelar ou horarios_disponiveis`
         };
     }
 
@@ -465,6 +468,145 @@ async function cancelarAgendamento(supabase: any, body: AgendamentoRequest): Pro
 
   } catch (error: any) {
     console.error('Erro em cancelarAgendamento:', error);
+    return { success: false, error: formatErrorMessage(error) };
+  }
+}
+
+async function buscarHorariosDisponiveis(supabase: any, body: AgendamentoRequest): Promise<AgendamentoResponse> {
+  const { clinic_id, filtros } = body;
+
+  if (!filtros?.medico_id || !filtros.data_inicio) {
+    return {
+      success: false,
+      error: 'medico_id e data_sugerida são obrigatórios'
+    };
+  }
+
+  const limite = filtros.limite || 3;
+
+  try {
+    // Definir horários de funcionamento
+    const HORARIOS_FUNCIONAMENTO = {
+      segunda_sexta: { inicio: 8, fim: 18 },
+      sabado: { inicio: 8, fim: 12 }
+    };
+    const DURACAO_CONSULTA = 30; // minutos
+
+    // Parse da data sugerida
+    const dataSugerida = new Date(filtros.data_inicio);
+    if (isNaN(dataSugerida.getTime())) {
+      return { success: false, error: 'data_sugerida inválida. Use formato ISO 8601' };
+    }
+
+    // Buscar agendamentos do médico
+    const inicioIntervalo = new Date(dataSugerida);
+    inicioIntervalo.setHours(0, 0, 0, 0);
+    
+    const fimIntervalo = new Date(inicioIntervalo);
+    fimIntervalo.setDate(fimIntervalo.getDate() + 14); // Buscar até 2 semanas à frente
+
+    const { data: agendamentos, error: agendError } = await supabase
+      .schema('clinica')
+      .from('agendamentos')
+      .select('data_agendamento')
+      .eq('medico_id', filtros.medico_id)
+      .gte('data_agendamento', inicioIntervalo.toISOString())
+      .lt('data_agendamento', fimIntervalo.toISOString())
+      .in('status', ['agendado', 'remarcado']);
+
+    if (agendError) {
+      console.error('Erro ao buscar agendamentos:', agendError);
+      return { success: false, error: 'Erro ao buscar agendamentos do médico' };
+    }
+
+    // Criar set de horários ocupados
+    const horariosOcupados = new Set(
+      (agendamentos || []).map((a: any) => new Date(a.data_agendamento).getTime())
+    );
+
+    // Gerar horários disponíveis
+    const horariosDisponiveis: Array<{ data: string; hora: string }> = [];
+    let dataAtual = new Date(dataSugerida);
+    
+    while (horariosDisponiveis.length < limite && dataAtual < fimIntervalo) {
+      const diaSemana = dataAtual.getDay();
+      
+      // Pular domingos (0)
+      if (diaSemana === 0) {
+        dataAtual.setDate(dataAtual.getDate() + 1);
+        dataAtual.setHours(0, 0, 0, 0);
+        continue;
+      }
+
+      // Determinar horário de funcionamento
+      let horaInicio: number, horaFim: number;
+      if (diaSemana === 6) { // Sábado
+        horaInicio = HORARIOS_FUNCIONAMENTO.sabado.inicio;
+        horaFim = HORARIOS_FUNCIONAMENTO.sabado.fim;
+      } else { // Segunda a Sexta
+        horaInicio = HORARIOS_FUNCIONAMENTO.segunda_sexta.inicio;
+        horaFim = HORARIOS_FUNCIONAMENTO.segunda_sexta.fim;
+      }
+
+      // Se é o primeiro dia, começar do horário sugerido
+      if (dataAtual.toDateString() === dataSugerida.toDateString()) {
+        const horaSugerida = dataSugerida.getHours();
+        const minutoSugerido = dataSugerida.getMinutes();
+        
+        // Arredondar para próximo slot de 30 minutos
+        if (minutoSugerido > 0 && minutoSugerido <= 30) {
+          dataAtual.setMinutes(30, 0, 0);
+        } else if (minutoSugerido > 30) {
+          dataAtual.setHours(horaSugerida + 1, 0, 0, 0);
+        }
+        
+        if (dataAtual.getHours() < horaInicio) {
+          dataAtual.setHours(horaInicio, 0, 0, 0);
+        }
+      } else {
+        dataAtual.setHours(horaInicio, 0, 0, 0);
+      }
+
+      // Verificar slots do dia
+      while (dataAtual.getHours() < horaFim || 
+             (dataAtual.getHours() === horaFim && dataAtual.getMinutes() === 0)) {
+        
+        // Última consulta deve ter tempo suficiente (30 minutos)
+        const ultimoHorario = new Date(dataAtual);
+        ultimoHorario.setMinutes(ultimoHorario.getMinutes() + DURACAO_CONSULTA);
+        
+        if (ultimoHorario.getHours() <= horaFim) {
+          const timestamp = dataAtual.getTime();
+          
+          if (!horariosOcupados.has(timestamp)) {
+            horariosDisponiveis.push({
+              data: dataAtual.toISOString(),
+              hora: `${String(dataAtual.getHours()).padStart(2, '0')}:${String(dataAtual.getMinutes()).padStart(2, '0')}`
+            });
+
+            if (horariosDisponiveis.length >= limite) {
+              break;
+            }
+          }
+        }
+
+        // Próximo slot (30 minutos)
+        dataAtual.setMinutes(dataAtual.getMinutes() + DURACAO_CONSULTA);
+      }
+
+      // Próximo dia
+      dataAtual.setDate(dataAtual.getDate() + 1);
+      dataAtual.setHours(0, 0, 0, 0);
+    }
+
+    return {
+      success: true,
+      message: `${horariosDisponiveis.length} horário(s) disponível(is) encontrado(s)`,
+      data: horariosDisponiveis
+    };
+
+  } catch (error: any) {
+    console.error('Erro em buscarHorariosDisponiveis:', error);
     return { success: false, error: formatErrorMessage(error) };
   }
 }
