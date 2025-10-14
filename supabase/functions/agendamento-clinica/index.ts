@@ -69,10 +69,22 @@ Deno.serve(async (req) => {
       case 'horarios_disponiveis':
         result = await buscarHorariosDisponiveis(supabase, body);
         break;
+      case 'listar_medicos':
+        result = await listarMedicos(supabase, body);
+        break;
+      case 'agenda_semanal':
+        result = await agendaSemanal(supabase, body);
+        break;
+      case 'listar_pacientes':
+        result = await listarPacientes(supabase, body);
+        break;
+      case 'editar_paciente':
+        result = await editarPaciente(supabase, body);
+        break;
       default:
         result = {
           success: false,
-          error: `Ação '${action}' não reconhecida. Use: criar, consultar, remarcar, cancelar ou horarios_disponiveis`
+          error: `Ação '${action}' não reconhecida. Use: criar, consultar, remarcar, cancelar, horarios_disponiveis, listar_medicos, agenda_semanal, listar_pacientes ou editar_paciente`
         };
     }
 
@@ -636,6 +648,284 @@ async function buscarHorariosDisponiveis(supabase: any, body: AgendamentoRequest
     };
   } catch (error: any) {
     console.error('Erro em buscarHorariosDisponiveis:', error);
+    return { success: false, error: formatErrorMessage(error) };
+  }
+}
+
+// ========================================
+// LISTAR MÉDICOS
+// ========================================
+async function listarMedicos(supabase: any, body: AgendamentoRequest): Promise<AgendamentoResponse> {
+  const { clinic_id } = body;
+
+  try {
+    const { data: medicos, error } = await supabase
+      .schema('clinica')
+      .from('medicos')
+      .select('id, nome, created_at')
+      .eq('clinic_id', clinic_id)
+      .order('nome', { ascending: true });
+
+    if (error) {
+      console.error('Erro ao listar médicos:', error);
+      return { success: false, error: 'Erro ao listar médicos' };
+    }
+
+    return {
+      success: true,
+      message: `${medicos?.length || 0} médico(s) encontrado(s)`,
+      data: medicos || []
+    };
+
+  } catch (error: any) {
+    console.error('Erro em listarMedicos:', error);
+    return { success: false, error: formatErrorMessage(error) };
+  }
+}
+
+// ========================================
+// AGENDA SEMANAL
+// ========================================
+async function agendaSemanal(supabase: any, body: AgendamentoRequest): Promise<AgendamentoResponse> {
+  const { clinic_id, agenda_semanal } = body;
+
+  if (!agenda_semanal?.medico_id) {
+    return { success: false, error: 'medico_id é obrigatório' };
+  }
+
+  try {
+    const { medico_id, data } = agenda_semanal;
+
+    // Verificar se médico pertence à clínica
+    const { data: medico, error: medicoError } = await supabase
+      .schema('clinica')
+      .from('medicos')
+      .select('id, nome')
+      .eq('id', medico_id)
+      .eq('clinic_id', clinic_id)
+      .single();
+
+    if (medicoError || !medico) {
+      return { success: false, error: 'Médico não encontrado nesta clínica' };
+    }
+
+    // Data base (semana atual se não informada)
+    const dataBase = data ? new Date(data) : new Date();
+    
+    // Calcular início da semana (segunda-feira)
+    const inicioSemana = new Date(dataBase);
+    const dia = inicioSemana.getDay();
+    const diffParaSegunda = dia === 0 ? -6 : 1 - dia;
+    inicioSemana.setDate(inicioSemana.getDate() + diffParaSegunda);
+    inicioSemana.setHours(0, 0, 0, 0);
+
+    // Calcular fim da semana (sexta-feira)
+    const fimSemana = new Date(inicioSemana);
+    fimSemana.setDate(fimSemana.getDate() + 4);
+    fimSemana.setHours(23, 59, 59, 999);
+
+    // Buscar agendamentos da semana
+    const { data: agendamentos, error } = await supabase
+      .schema('clinica')
+      .from('agendamentos')
+      .select(`
+        id,
+        procedimento,
+        data_agendamento,
+        status,
+        informacoes_adicionais,
+        paciente_id
+      `)
+      .eq('medico_id', medico_id)
+      .gte('data_agendamento', inicioSemana.toISOString())
+      .lte('data_agendamento', fimSemana.toISOString())
+      .neq('status', 'cancelado');
+
+    if (error) {
+      console.error('Erro ao buscar agenda semanal:', error);
+      return { success: false, error: 'Erro ao buscar agenda semanal' };
+    }
+
+    // Buscar dados dos pacientes
+    const pacienteIds = [...new Set((agendamentos || []).map((a: any) => a.paciente_id))];
+    let pacientesMap = new Map();
+
+    if (pacienteIds.length > 0) {
+      const { data: pacientes } = await supabase
+        .schema('clinica')
+        .from('pacientes')
+        .select('id, nome, telefone')
+        .in('id', pacienteIds);
+
+      pacientesMap = new Map((pacientes || []).map((p: any) => [p.id, p]));
+    }
+
+    // Gerar grade de horários (7h às 19h, slots de 30 minutos)
+    const horariosDisponiveis = [];
+    for (let hora = 7; hora < 19; hora++) {
+      horariosDisponiveis.push(`${hora.toString().padStart(2, '0')}:00`);
+      horariosDisponiveis.push(`${hora.toString().padStart(2, '0')}:30`);
+    }
+
+    // Gerar dias da semana
+    const diasSemana = [];
+    for (let i = 0; i < 5; i++) {
+      const dia = new Date(inicioSemana);
+      dia.setDate(dia.getDate() + i);
+      diasSemana.push({
+        data: dia.toISOString().split('T')[0],
+        diaSemana: dia.toLocaleDateString('pt-BR', { weekday: 'long' }),
+        diaMes: dia.getDate()
+      });
+    }
+
+    // Organizar agendamentos por data e hora
+    const agendaPorDiaHora: any = {};
+    (agendamentos || []).forEach((agendamento: any) => {
+      const dataAgendamento = new Date(agendamento.data_agendamento);
+      const data = dataAgendamento.toISOString().split('T')[0];
+      const hora = dataAgendamento.toTimeString().slice(0, 5);
+
+      if (!agendaPorDiaHora[data]) {
+        agendaPorDiaHora[data] = {};
+      }
+
+      agendaPorDiaHora[data][hora] = {
+        ...agendamento,
+        paciente: pacientesMap.get(agendamento.paciente_id) || null
+      };
+    });
+
+    return {
+      success: true,
+      message: 'Agenda semanal carregada',
+      data: {
+        medico,
+        diasSemana,
+        horariosDisponiveis,
+        agendamentos: agendaPorDiaHora,
+        inicioSemana: inicioSemana.toISOString().split('T')[0],
+        fimSemana: fimSemana.toISOString().split('T')[0]
+      }
+    };
+
+  } catch (error: any) {
+    console.error('Erro em agendaSemanal:', error);
+    return { success: false, error: formatErrorMessage(error) };
+  }
+}
+
+// ========================================
+// LISTAR PACIENTES
+// ========================================
+async function listarPacientes(supabase: any, body: AgendamentoRequest): Promise<AgendamentoResponse> {
+  const { clinic_id, paciente_busca } = body;
+
+  try {
+    let query = supabase
+      .schema('clinica')
+      .from('pacientes')
+      .select('id, nome, telefone, data_nascimento, created_at')
+      .eq('clinic_id', clinic_id)
+      .order('nome', { ascending: true });
+
+    // Aplicar filtro de busca se fornecido
+    if (paciente_busca?.busca) {
+      const busca = paciente_busca.busca;
+      query = query.or(`nome.ilike.%${busca}%,telefone.ilike.%${busca}%`);
+    }
+
+    const { data: pacientes, error } = await query;
+
+    if (error) {
+      console.error('Erro ao listar pacientes:', error);
+      return { success: false, error: 'Erro ao listar pacientes' };
+    }
+
+    return {
+      success: true,
+      message: `${pacientes?.length || 0} paciente(s) encontrado(s)`,
+      data: pacientes || []
+    };
+
+  } catch (error: any) {
+    console.error('Erro em listarPacientes:', error);
+    return { success: false, error: formatErrorMessage(error) };
+  }
+}
+
+// ========================================
+// EDITAR PACIENTE
+// ========================================
+async function editarPaciente(supabase: any, body: AgendamentoRequest): Promise<AgendamentoResponse> {
+  const { clinic_id, paciente_edicao } = body;
+
+  if (!paciente_edicao) {
+    return { success: false, error: 'Dados do paciente são obrigatórios' };
+  }
+
+  const { id, nome, telefone, data_nascimento } = paciente_edicao;
+
+  if (!id || !nome || !telefone || !data_nascimento) {
+    return { success: false, error: 'ID, nome, telefone e data de nascimento são obrigatórios' };
+  }
+
+  try {
+    // Verificar se o paciente existe e pertence à clínica
+    const { data: pacienteExistente, error: errorVerificar } = await supabase
+      .schema('clinica')
+      .from('pacientes')
+      .select('id, telefone')
+      .eq('id', id)
+      .eq('clinic_id', clinic_id)
+      .single();
+
+    if (errorVerificar || !pacienteExistente) {
+      return { success: false, error: 'Paciente não encontrado nesta clínica' };
+    }
+
+    // Verificar se o telefone já está sendo usado por outro paciente
+    if (telefone !== pacienteExistente.telefone) {
+      const { data: telefoneExistente } = await supabase
+        .schema('clinica')
+        .from('pacientes')
+        .select('id')
+        .eq('clinic_id', clinic_id)
+        .eq('telefone', telefone)
+        .neq('id', id)
+        .single();
+
+      if (telefoneExistente) {
+        return { success: false, error: 'Este telefone já está sendo usado por outro paciente' };
+      }
+    }
+
+    // Atualizar paciente
+    const { data: pacienteAtualizado, error: errorAtualizar } = await supabase
+      .schema('clinica')
+      .from('pacientes')
+      .update({
+        nome,
+        telefone,
+        data_nascimento
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (errorAtualizar) {
+      console.error('Erro ao atualizar paciente:', errorAtualizar);
+      return { success: false, error: 'Erro ao atualizar paciente' };
+    }
+
+    return {
+      success: true,
+      message: 'Paciente atualizado com sucesso',
+      data: pacienteAtualizado
+    };
+
+  } catch (error: any) {
+    console.error('Erro em editarPaciente:', error);
     return { success: false, error: formatErrorMessage(error) };
   }
 }

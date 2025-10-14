@@ -1,7 +1,7 @@
 // Tipos compartilhados entre edge functions
 
 export interface AgendamentoRequest {
-  action: 'criar' | 'consultar' | 'remarcar' | 'cancelar' | 'horarios_disponiveis';
+  action: 'criar' | 'consultar' | 'remarcar' | 'cancelar' | 'horarios_disponiveis' | 'listar_medicos' | 'agenda_semanal' | 'listar_pacientes' | 'editar_paciente';
   clinic_id?: string;
   paciente?: {
     nome: string;
@@ -24,6 +24,19 @@ export interface AgendamentoRequest {
     telefone?: string;
     status?: string;
     limite?: number;
+  };
+  agenda_semanal?: {
+    medico_id: string;
+    data?: string; // YYYY-MM-DD, se não informado usa semana atual
+  };
+  paciente_edicao?: {
+    id: string;
+    nome: string;
+    telefone: string;
+    data_nascimento: string;
+  };
+  paciente_busca?: {
+    busca?: string; // Busca por nome ou telefone
   };
 }
 
