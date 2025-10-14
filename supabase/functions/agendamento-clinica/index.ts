@@ -213,12 +213,56 @@ async function criarAgendamento(supabase: any, body: AgendamentoRequest): Promis
       }
     }
 
-    // 3. Criar agendamento
+    // 3. Normalizar e validar data do agendamento
+    let dataAgendamentoNormalizada: string;
+    try {
+      // Aceita diversos formatos: ISO, "DD/MM/YYYY HH:mm", "YYYY-MM-DD HH:mm", etc
+      const dataRecebida = agendamento.data_agendamento;
+      
+      // Se já estiver em formato ISO válido, usa direto
+      if (dataRecebida.includes('T') || dataRecebida.includes('+')) {
+        dataAgendamentoNormalizada = new Date(dataRecebida).toISOString();
+      } else {
+        // Tenta parsear formatos como "20/10/2025 08:00" ou "2025-10-20 08:00"
+        const [datePart, timePart] = dataRecebida.split(' ');
+        let year: number, month: number, day: number;
+        
+        if (datePart.includes('/')) {
+          // Formato DD/MM/YYYY
+          const [d, m, y] = datePart.split('/').map(Number);
+          day = d;
+          month = m;
+          year = y;
+        } else {
+          // Formato YYYY-MM-DD
+          const [y, m, d] = datePart.split('-').map(Number);
+          year = y;
+          month = m;
+          day = d;
+        }
+        
+        const [hour, minute] = (timePart || '00:00').split(':').map(Number);
+        
+        // Cria data em UTC
+        const dataUTC = new Date(Date.UTC(year, month - 1, day, hour, minute));
+        dataAgendamentoNormalizada = dataUTC.toISOString();
+      }
+      
+      console.log(`Data original: ${agendamento.data_agendamento} -> Normalizada: ${dataAgendamentoNormalizada}`);
+    } catch (error) {
+      console.error('Erro ao normalizar data:', error);
+      return { 
+        success: false, 
+        error: `Formato de data inválido: ${agendamento.data_agendamento}. Use formato: DD/MM/YYYY HH:mm ou YYYY-MM-DD HH:mm` 
+      };
+    }
+
+    // 4. Criar agendamento
     const agendamentoData: any = {
       clinic_id,
       paciente_id: pacienteId,
       procedimento: agendamento.procedimento,
-      data_agendamento: agendamento.data_agendamento,
+      data_agendamento: dataAgendamentoNormalizada,
       status: 'agendado'
     };
 
