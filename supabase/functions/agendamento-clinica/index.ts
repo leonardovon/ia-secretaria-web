@@ -257,7 +257,7 @@ async function consultarAgendamentos(supabase: any, body: AgendamentoRequest): P
     const { data: pacientesRows, error: pacientesError } = await supabase
       .schema('clinica')
       .from('pacientes')
-      .select('id')
+      .select('id, telefone')
       .eq('clinic_id', clinic_id);
 
     if (pacientesError) {
@@ -272,12 +272,23 @@ async function consultarAgendamentos(supabase: any, body: AgendamentoRequest): P
       return { success: true, message: '0 agendamento(s) encontrado(s)', data: [] };
     }
 
-    // 2) Se filtro de paciente_id existir, valida se pertence à clínica
+    // 2) Se filtro de telefone existir, encontrar paciente_id correspondente
+    if (filtros?.telefone) {
+      const pacienteComTelefone = (pacientesRows ?? []).find((p: any) => p.telefone === filtros.telefone);
+      if (pacienteComTelefone) {
+        filtros.paciente_id = pacienteComTelefone.id;
+      } else {
+        // Telefone não encontrado na clínica
+        return { success: true, message: '0 agendamento(s) encontrado(s)', data: [] };
+      }
+    }
+
+    // 3) Se filtro de paciente_id existir, valida se pertence à clínica
     if (filtros?.paciente_id && !pacienteIds.includes(filtros.paciente_id)) {
       return { success: true, message: '0 agendamento(s) encontrado(s)', data: [] };
     }
 
-    // 3) Montar consulta de agendamentos filtrando por paciente_id
+    // 4) Montar consulta de agendamentos filtrando por paciente_id
     let query = supabase
       .schema('clinica')
       .from('agendamentos')
@@ -301,7 +312,7 @@ async function consultarAgendamentos(supabase: any, body: AgendamentoRequest): P
       return { success: true, message: '0 agendamento(s) encontrado(s)', data: [] };
     }
 
-    // 4) Enriquecer com dados de paciente e médico (opcional)
+    // 5) Enriquecer com dados de paciente e médico (opcional)
     const uniqPacienteIds = [...new Set(agendamentos.map((a: any) => a.paciente_id))];
     const uniqMedicoIds = [...new Set(agendamentos.map((a: any) => a.medico_id).filter(Boolean))];
 

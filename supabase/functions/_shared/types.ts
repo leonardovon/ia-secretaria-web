@@ -21,6 +21,7 @@ export interface AgendamentoRequest {
     data_fim?: string;
     medico_id?: string;
     paciente_id?: string;
+    telefone?: string;
     status?: string;
     limite?: number;
   };
