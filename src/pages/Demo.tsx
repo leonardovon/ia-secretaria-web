@@ -86,7 +86,10 @@ const Demo = () => {
 
           <Card className="mb-8 shadow-card">
             <CardHeader>
-              <CardTitle className="text-2xl">🤖 Capacidades do Agente de Atendimento</CardTitle>
+              <CardTitle className="text-2xl flex items-center gap-2">
+                <MessageSquare className="w-6 h-6 text-primary" />
+                Capacidades do Agente de Atendimento
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <p className="text-muted-foreground">
