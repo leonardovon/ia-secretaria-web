@@ -15,13 +15,37 @@ export function validateTelefone(telefone: string): ValidationResult {
   return { valid: true };
 }
 
+export function convertBrazilianDateToISO(date: string): string {
+  // Se já estiver em formato ISO (YYYY-MM-DD), retorna como está
+  if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return date;
+  }
+  
+  // Se estiver em formato brasileiro (DD/MM/YYYY)
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+    const [day, month, year] = date.split('/');
+    return `${year}-${month}-${day}`;
+  }
+  
+  // Tenta converter via Date (pode funcionar com outros formatos)
+  const parsedDate = new Date(date);
+  if (!isNaN(parsedDate.getTime())) {
+    return parsedDate.toISOString().split('T')[0];
+  }
+  
+  // Se não conseguir converter, retorna como está (vai falhar na validação)
+  return date;
+}
+
 export function validateDataNascimento(data: string): ValidationResult {
-  const date = new Date(data);
+  // Converte para ISO se necessário
+  const dataISO = convertBrazilianDateToISO(data);
+  const date = new Date(dataISO);
   
   if (isNaN(date.getTime())) {
     return {
       valid: false,
-      error: 'Data de nascimento inválida'
+      error: 'Data de nascimento inválida. Use formato DD/MM/YYYY ou YYYY-MM-DD'
     };
   }
   
@@ -31,7 +55,7 @@ export function validateDataNascimento(data: string): ValidationResult {
   if (idade < 0 || idade > 150) {
     return {
       valid: false,
-      error: 'Data de nascimento fora do intervalo válido'
+      error: 'Data de nascimento fora do intervalo válido (0-150 anos)'
     };
   }
   

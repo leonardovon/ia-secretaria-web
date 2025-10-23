@@ -4,7 +4,8 @@ import {
   validateDataNascimento,
   validateDataAgendamento,
   sanitizeTelefone,
-  formatErrorMessage
+  formatErrorMessage,
+  convertBrazilianDateToISO
 } from '../_shared/validation.ts';
 import type { AgendamentoRequest, AgendamentoResponse } from '../_shared/types.ts';
 
@@ -155,6 +156,9 @@ async function criarAgendamento(supabase: any, body: AgendamentoRequest): Promis
       pacienteId = pacienteExistente.id;
       console.log('Paciente encontrado:', pacienteId);
     } else {
+      // Converte data de nascimento para formato ISO antes de inserir
+      const dataNascimentoISO = convertBrazilianDateToISO(paciente.data_nascimento);
+      
       const { data: novoPaciente, error: insertError } = await supabase
         .schema('clinica')
         .from('pacientes')
@@ -162,14 +166,17 @@ async function criarAgendamento(supabase: any, body: AgendamentoRequest): Promis
           clinic_id,
           nome: paciente.nome,
           telefone: telefoneSanitized,
-          data_nascimento: paciente.data_nascimento
+          data_nascimento: dataNascimentoISO
         })
         .select('id')
         .single();
 
       if (insertError) {
         console.error('Erro ao criar paciente:', insertError);
-        return { success: false, error: 'Erro ao criar paciente' };
+        return { 
+          success: false, 
+          error: `Erro ao criar paciente: ${insertError.message || 'Data de nascimento inválida. Use formato DD/MM/YYYY ou YYYY-MM-DD'}` 
+        };
       }
 
       pacienteId = novoPaciente.id;
@@ -945,14 +952,16 @@ async function editarPaciente(supabase: any, body: AgendamentoRequest): Promise<
       }
     }
 
-    // Atualizar paciente
+    // Atualizar paciente (converte data para ISO)
+    const dataNascimentoISO = convertBrazilianDateToISO(data_nascimento);
+    
     const { data: pacienteAtualizado, error: errorAtualizar } = await supabase
       .schema('clinica')
       .from('pacientes')
       .update({
         nome,
         telefone,
-        data_nascimento
+        data_nascimento: dataNascimentoISO
       })
       .eq('id', id)
       .select()
@@ -960,7 +969,10 @@ async function editarPaciente(supabase: any, body: AgendamentoRequest): Promise<
 
     if (errorAtualizar) {
       console.error('Erro ao atualizar paciente:', errorAtualizar);
-      return { success: false, error: 'Erro ao atualizar paciente' };
+      return { 
+        success: false, 
+        error: `Erro ao atualizar paciente: ${errorAtualizar.message || 'Data de nascimento inválida. Use formato DD/MM/YYYY ou YYYY-MM-DD'}` 
+      };
     }
 
     return {
