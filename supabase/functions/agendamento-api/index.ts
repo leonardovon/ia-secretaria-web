@@ -70,7 +70,7 @@ async function criarAgendamento(req: Request, supabase: any) {
       );
     }
 
-    // Validar data de nascimento
+    // Validar e converter data de nascimento
     const dataNascimentoValidation = validateDataNascimento(paciente.data_nascimento);
     if (!dataNascimentoValidation.valid) {
       return new Response(
@@ -78,6 +78,9 @@ async function criarAgendamento(req: Request, supabase: any) {
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    // Converter data de nascimento para ISO
+    const dataNascimentoISO = convertBrazilianDateToISO(paciente.data_nascimento);
 
     // Validar data de agendamento
     if (data_agendamento) {
@@ -103,9 +106,7 @@ async function criarAgendamento(req: Request, supabase: any) {
       pacienteId = pacienteExistente.id;
       console.log('Paciente encontrado:', pacienteId);
     } else {
-      // Converte data de nascimento para formato ISO antes de inserir
-      const dataNascimentoISO = convertBrazilianDateToISO(paciente.data_nascimento);
-      
+      // Criar novo paciente com data de nascimento já convertida
       const { data: novoPaciente, error: insertError } = await supabase
         .from('pacientes')
         .insert({
