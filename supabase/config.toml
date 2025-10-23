@@ -1,1 +1,7 @@
 project_id = "ononwldrcvretdjflyjk"
+
+[functions.agendamento-api]
+verify_jwt = false
+
+[functions.agendamento-clinica]
+verify_jwt = false
