@@ -110,6 +110,11 @@ Deno.serve(async (req) => {
 async function criarAgendamento(supabase: any, body: AgendamentoRequest): Promise<AgendamentoResponse> {
   const { clinic_id, paciente, agendamento } = body;
 
+  console.log('=== CRIAR AGENDAMENTO - INÍCIO ===');
+  console.log('Clinic ID:', clinic_id);
+  console.log('Dados do paciente:', JSON.stringify(paciente));
+  console.log('Dados do agendamento:', JSON.stringify(agendamento));
+
   if (!paciente || !agendamento) {
     return {
       success: false,
@@ -118,79 +123,99 @@ async function criarAgendamento(supabase: any, body: AgendamentoRequest): Promis
   }
 
   // Validações
+  console.log('Validando telefone:', paciente.telefone);
   const telefoneValidation = validateTelefone(paciente.telefone);
   if (!telefoneValidation.valid) {
+    console.error('Erro validação telefone:', telefoneValidation.error);
     return { success: false, error: telefoneValidation.error! };
   }
 
+  console.log('Validando data de nascimento:', paciente.data_nascimento);
   const dataNascValidation = validateDataNascimento(paciente.data_nascimento);
   if (!dataNascValidation.valid) {
+    console.error('Erro validação data nascimento:', dataNascValidation.error);
     return { success: false, error: dataNascValidation.error! };
   }
 
+  console.log('Validando data de agendamento:', agendamento.data_agendamento);
   const dataAgendValidation = validateDataAgendamento(agendamento.data_agendamento);
   if (!dataAgendValidation.valid) {
+    console.error('Erro validação data agendamento:', dataAgendValidation.error);
     return { success: false, error: dataAgendValidation.error! };
   }
 
   const telefoneSanitized = sanitizeTelefone(paciente.telefone);
+  console.log('Telefone sanitizado:', telefoneSanitized);
 
   try {
     // 1. Buscar ou criar paciente
     let pacienteId: string;
     
+    console.log('Buscando paciente existente...');
+    console.log('Query: clinic_id =', clinic_id, ', telefone =', telefoneSanitized);
+    
     const { data: pacienteExistente, error: searchError } = await supabase
       .schema('clinica')
       .from('pacientes')
-      .select('id')
+      .select('id, nome')
       .eq('clinic_id', clinic_id)
       .eq('telefone', telefoneSanitized)
       .maybeSingle();
 
     if (searchError) {
       console.error('Erro ao buscar paciente:', searchError);
-      return { success: false, error: 'Erro ao buscar paciente' };
+      return { success: false, error: `Erro ao buscar paciente: ${searchError.message}` };
     }
 
     if (pacienteExistente) {
       pacienteId = pacienteExistente.id;
-      console.log('Paciente encontrado:', pacienteId);
+      console.log('✅ Paciente encontrado:', pacienteExistente.nome, '- ID:', pacienteId);
     } else {
+      console.log('❌ Paciente não encontrado. Criando novo paciente...');
+      
       // Converte data de nascimento para formato ISO antes de inserir
       const dataNascimentoISO = convertBrazilianDateToISO(paciente.data_nascimento);
+      console.log('Data nascimento convertida:', paciente.data_nascimento, '->', dataNascimentoISO);
+      
+      const dadosNovoPaciente = {
+        clinic_id,
+        nome: paciente.nome,
+        telefone: telefoneSanitized,
+        data_nascimento: dataNascimentoISO
+      };
+      
+      console.log('Inserindo paciente:', JSON.stringify(dadosNovoPaciente));
       
       const { data: novoPaciente, error: insertError } = await supabase
         .schema('clinica')
         .from('pacientes')
-        .insert({
-          clinic_id,
-          nome: paciente.nome,
-          telefone: telefoneSanitized,
-          data_nascimento: dataNascimentoISO
-        })
+        .insert(dadosNovoPaciente)
         .select('id')
         .single();
 
       if (insertError) {
-        console.error('Erro ao criar paciente:', insertError);
+        console.error('❌ Erro ao criar paciente:', insertError);
+        console.error('Detalhes do erro:', JSON.stringify(insertError));
         return { 
           success: false, 
-          error: `Erro ao criar paciente: ${insertError.message || 'Data de nascimento inválida. Use formato DD/MM/YYYY ou YYYY-MM-DD'}` 
+          error: `Erro ao criar paciente: ${insertError.message || insertError.hint || 'Data de nascimento inválida. Use formato DD/MM/YYYY ou YYYY-MM-DD'}` 
         };
       }
 
       pacienteId = novoPaciente.id;
-      console.log('Novo paciente criado:', pacienteId);
+      console.log('✅ Novo paciente criado com sucesso! ID:', pacienteId);
     }
 
     // 2. Buscar ou criar médico (se necessário)
     let medicoId: string | undefined = agendamento.medico_id;
 
     if (!medicoId && agendamento.medico_nome) {
+      console.log('Buscando médico pelo nome:', agendamento.medico_nome);
+      
       const { data: medicoExistente, error: searchMedicoError } = await supabase
         .schema('clinica')
         .from('medicos')
-        .select('id')
+        .select('id, nome')
         .eq('clinic_id', clinic_id)
         .ilike('nome', agendamento.medico_nome)
         .maybeSingle();
@@ -201,7 +226,10 @@ async function criarAgendamento(supabase: any, body: AgendamentoRequest): Promis
 
       if (medicoExistente) {
         medicoId = medicoExistente.id;
+        console.log('✅ Médico encontrado:', medicoExistente.nome, '- ID:', medicoId);
       } else {
+        console.log('❌ Médico não encontrado. Criando novo médico...');
+        
         const { data: novoMedico, error: insertMedicoError } = await supabase
           .schema('clinica')
           .from('medicos')
@@ -213,11 +241,17 @@ async function criarAgendamento(supabase: any, body: AgendamentoRequest): Promis
           .single();
 
         if (insertMedicoError) {
-          console.error('Erro ao criar médico:', insertMedicoError);
+          console.error('❌ Erro ao criar médico:', insertMedicoError);
+          console.error('Detalhes:', JSON.stringify(insertMedicoError));
         } else {
           medicoId = novoMedico.id;
+          console.log('✅ Novo médico criado! ID:', medicoId);
         }
       }
+    } else if (medicoId) {
+      console.log('Usando médico_id fornecido:', medicoId);
+    } else {
+      console.log('⚠️ Nenhum médico informado (medico_id ou medico_nome)');
     }
 
     // 3. Normalizar e validar data do agendamento
@@ -265,6 +299,7 @@ async function criarAgendamento(supabase: any, body: AgendamentoRequest): Promis
     }
 
     // 4. Criar agendamento
+    console.log('Criando agendamento...');
     const agendamentoData: any = {
       clinic_id,
       paciente_id: pacienteId,
@@ -275,11 +310,16 @@ async function criarAgendamento(supabase: any, body: AgendamentoRequest): Promis
 
     if (medicoId) {
       agendamentoData.medico_id = medicoId;
+      console.log('Médico vinculado:', medicoId);
+    } else {
+      console.log('⚠️ Agendamento sem médico vinculado');
     }
 
     if (agendamento.informacoes_adicionais) {
       agendamentoData.informacoes_adicionais = agendamento.informacoes_adicionais;
     }
+
+    console.log('Dados do agendamento a inserir:', JSON.stringify(agendamentoData));
 
     const { data: novoAgendamento, error: agendError } = await supabase
       .schema('clinica')
@@ -297,9 +337,13 @@ async function criarAgendamento(supabase: any, body: AgendamentoRequest): Promis
       .single();
 
     if (agendError) {
-      console.error('Erro ao criar agendamento:', agendError);
-      return { success: false, error: 'Erro ao criar agendamento' };
+      console.error('❌ Erro ao criar agendamento:', agendError);
+      console.error('Detalhes do erro:', JSON.stringify(agendError));
+      return { success: false, error: `Erro ao criar agendamento: ${agendError.message || agendError.hint}` };
     }
+
+    console.log('✅ Agendamento criado com sucesso!');
+    console.log('=== CRIAR AGENDAMENTO - FIM ===');
 
     return {
       success: true,
